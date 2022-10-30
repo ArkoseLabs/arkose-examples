@@ -1,0 +1,24 @@
+<form>
+    <div class="box">
+      <h1>Login</h1>
+      <input type="email" name="email" value="example@gmail.com" class="email" />
+      <input type="password" name="password" value="abcdxyz" class="password" />
+      <ng-container *ngIf="!showArkoseEC">
+        <a>
+          <div class="btn" (click)="showArkoseEC=true">Sign In</div>
+        </a>
+      </ng-container>
+      <div class="mt-15">
+        <arkose
+          *ngIf="showArkoseEC"
+          [publicKey]="publicKey"
+          selector="arkose-ec"
+          mode="inline"
+          (onCompleted)="onCompleted($event)"
+          (onError)="onError($event)"
+          class="mt-15"
+        >
+        </arkose>
+      </div>
+    </div>
+</form>

@@ -1,0 +1,20 @@
+<form>
+    <div class="box">
+      <h1>Login</h1>
+      <input type="email" name="email" value="example@gmail.com" class="email" />
+      <input type="password" name="password" value="abcdxyz" class="password" />
+      <arkose
+        [publicKey]="publicKey"
+        mode="lightbox"
+        (onCompleted)="onCompleted($event)"
+        (onError)="onError($event)"
+        class="mt-5"
+      >
+      </arkose>
+      <ng-container>
+        <a>
+          <div class="btn" (click)="onSubmit()">Sign In</div>
+        </a>
+      </ng-container>
+    </div>
+</form>
