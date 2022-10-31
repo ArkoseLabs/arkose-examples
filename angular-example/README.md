@@ -7,7 +7,7 @@ More details of how to implement the Arkose Labs API can be found at https://dev
 Go to the project directory
 
 ```bash
-  cd arkose-angular-example
+  cd angular-example
 ```
 
 Install dependencies
