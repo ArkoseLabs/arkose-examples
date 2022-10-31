@@ -1,0 +1,50 @@
+{
+  "name": "arkose-vue2-example",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "@vue/cli-plugin-babel": "^5.0.8",
+    "vue": "^2.6.14",
+    "vue-router": "^3.0.1"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-eslint": "^5.0.8",
+    "@vue/cli-service": "^5.0.8",
+    "babel-eslint": "^10.0.3",
+    "eslint": "^7.5.0",
+    "eslint-plugin-vue": "^6.2.2",
+    "vue-template-compiler": "^2.6.14"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/essential",
+      "eslint:recommended"
+    ],
+    "rules": {
+      "semi": [2, "always"]
+    },
+    "parserOptions": {
+      "parser": "babel-eslint"
+    }
+  },
+  "postcss": {
+    "plugins": {
+      "autoprefixer": {}
+    }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 8"
+  ],
+  "description": "Arkose Vue2 example"
+}
