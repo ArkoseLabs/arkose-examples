@@ -33,7 +33,7 @@ const ForgotPassword = () => {
       <Link to="/">Login</Link>
       <Arkose
         publicKey={publicKey}
-        selector="arkose-ec"
+        selector="#arkose-ec"
         mode="inline"
         onCompleted={onCompleted}
         onError={onError}

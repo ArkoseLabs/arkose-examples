@@ -5,17 +5,21 @@ export default class Arkose extends React.Component {
   constructor () {
     super();
     this.myEnforcement = null;
+    this.scriptId = '';
   }
 
-  // Append the JS tag to the Document Body.
-  loadScript = () => {
-    const scriptId = 'arkose-script';
-    const currentScript = document.getElementById(scriptId);
+  removeScript = () => {
+    const currentScript = document.getElementById(this.scriptId);
     if (currentScript) {
       currentScript.remove();
     }
+  };
+
+  // Append the JS tag to the Document Body.
+  loadScript = () => {
+    this.removeScript();
     const script = document.createElement('script');
-    script.id = scriptId;
+    script.id = this.scriptId;
     script.type = 'text/javascript';
     script.src = `https://client-api.arkoselabs.com/v2/${this.props.publicKey}/api.js`;
     script.setAttribute('data-callback', 'setupEnforcement');
@@ -31,57 +35,40 @@ export default class Arkose extends React.Component {
   setupEnforcement = (myEnforcement) => {
     this.myEnforcement = myEnforcement;
     this.myEnforcement.setConfig({
-      selector: this.props.selector && `#${this.props.selector}`,
+      selector: this.props.selector,
       mode: this.props.mode,
       onReady: () => {
-        if (this.props.onReady) {
-          this.props.onReady();
-        }
+        this.props.onReady();
       },
       onShown: () => {
-        if (this.props.onShown) {
-          this.props.onShown();
-        }
+        this.props.onShown();
       },
       onShow: () => {
-        if (this.props.onShow) {
-          this.props.onShow();
-        }
+        this.props.onShow();
       },
       onSuppress: () => {
-        if (this.props.onSuppress) {
-          this.props.onSuppress();
-        }
+        this.props.onSuppress();
       },
       onCompleted: (response) => {
-        if (this.props.onCompleted) {
-          this.props.onCompleted(response.token);
-        }
+        this.props.onCompleted(response.token);
       },
       onReset: () => {
-        if (this.props.onReset) {
-          this.props.onReset();
-        }
+        this.props.onReset();
       },
       onHide: () => {
-        if (this.props.onHide) {
-          this.props.onHide();
-        }
+        this.props.onHide();
       },
       onError: (response) => {
-        if (this.props.onError) {
-          this.props.onError(response?.error);
-        }
+        this.props.onError(response?.error);
       },
       onFailed: (response) => {
-        if (this.props.onFailed) {
-          this.props.onFailed(response);
-        }
+        this.props.onFailed(response);
       }
     });
   };
 
   componentDidMount () {
+    this.scriptId = `arkose-script-${this.props.publicKey}`;
     const scriptElement = this.loadScript();
     // This will inject required html and css after the Arkose script is properly loaded
     scriptElement.onload = () => {
@@ -98,12 +85,13 @@ export default class Arkose extends React.Component {
     if (window.setupEnforcement) {
       delete window.setupEnforcement;
     }
+    this.removeScript();
   }
 
   render () {
     return (
       <>
-        {this.props.mode === 'inline' && <div id={this.props.selector}></div>}
+        {this.props.mode === 'inline' && <div id={this.props?.selector?.slice(1)}></div>}
       </>
     );
   }
@@ -112,7 +100,7 @@ export default class Arkose extends React.Component {
 Arkose.propTypes = {
   publicKey: PropTypes.string.isRequired,
   mode: PropTypes.oneOf(['inline', 'lightbox']),
-  selector: PropTypes.string,
+  selector: PropTypes.string, // Any valid DOM selector is allowed here
   nonce: PropTypes.string,
   onReady: PropTypes.func,
   onShown: PropTypes.func,
@@ -123,4 +111,16 @@ Arkose.propTypes = {
   onHide: PropTypes.func,
   onError: PropTypes.func,
   onFailed: PropTypes.func
+};
+
+Arkose.defaultProps = {
+  onReady: () => {},
+  onShown: () => {},
+  onShow: () => {},
+  onSuppress: () => {},
+  onCompleted: () => {},
+  onReset: () => {},
+  onHide: () => {},
+  onError: () => {},
+  onFailed: () => {}
 };

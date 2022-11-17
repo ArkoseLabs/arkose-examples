@@ -1,4 +1,4 @@
-# arkose-vue-example
+# arkose-react-example
 This example project provides a simple React(v18) component that wraps the Arkose Labs Client API.
 More details of how to implement the Arkose Labs API can be found at https://developer.arkoselabs.com
 
