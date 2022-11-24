@@ -1,7 +1,7 @@
 {
   "name": "arkose-vue2-example",
   "version": "1.0.0",
-  "private": true,
+  "license": "MIT",
   "scripts": {
     "start": "vue-cli-service serve",
     "build": "vue-cli-service build",
