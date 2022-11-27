@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Multi Keys Example</title>
+	<meta charset="UTF-8" />
+</head>
+<body>
+	<div>
+		<p>Public Key: 25704298-2ADD-4D5D-A266-DE8AD78047CB</p>
+		<button id="load1">Load JS</button>
+		<button id="ec1" disabled>Open EC</button>
+	</div>
+	<div>
+		<p>Public Key: 72ADCC85-E260-4D5A-8BE9-DC48739A7B4C</p>
+    <button id="load2">Load JS</button>
+		<button id="ec2" disabled>Open EC</button>
+	<div>
+    <script>
+      const loadJS = (key, callback) => {
+        const currentScript = document.querySelector(`script[src*="${key}/api.js"]`)
+        if (currentScript) {
+          console.log('script already loaded');
+          return;
+        }
+        const script = document.createElement("script");
+        script.type = "text/javascript";
+        script.src = `https://client-api.arkoselabs.com/v2/${key}/api.js`;
+        script.setAttribute("data-callback", callback);
+        script.async = true;
+        script.defer = true;
+        document.body.appendChild(script);
+      }
+  
+      window.loadEc1 = (enforcement) => {
+        enforcement.setConfig({
+          selector: '#ec1',
+          onReady: () => {
+            document.getElementById("ec1").disabled = false;
+          },
+          onCompleted: (response) => {
+            console.log(response.token);
+          }
+        });
+      }
+
+      window.loadEc2 = (enforcement) => {
+        enforcement.setConfig({
+          selector: '#ec2',
+          onReady: () => {
+            document.getElementById("ec2").disabled = false;
+          },
+          onCompleted: (response) => {
+            console.log(response.token);
+          }
+        });
+      }
+      document.getElementById("load1").onclick = () => { loadJS("25704298-2ADD-4D5D-A266-DE8AD78047CB", "loadEc1") }
+      document.getElementById("load2").onclick = () => { loadJS("72ADCC85-E260-4D5A-8BE9-DC48739A7B4C", "loadEc2") }
+    </script>
+</body>
+
+</html>
