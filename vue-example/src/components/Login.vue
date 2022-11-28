@@ -23,27 +23,27 @@ import Arkose from './Arkose.vue';
 export default {
   name: 'Login',
   components: {
-    Arkose,
+    Arkose
   },
-  data() {
+  data () {
     return {
       publicKey: process.env.VUE_APP_ARKOSE_PUBLIC_KEY,
-      arkoseToken: null,
+      arkoseToken: null
     };
   },
   methods: {
-    onCompleted(token) {
+    onCompleted (token) {
       this.arkoseToken = token;
       router.replace({ path: '/dashboard' });
     },
-    onError(errorMessage) {
+    onError (errorMessage) {
       alert(errorMessage);
     },
-    onSubmit() {
+    onSubmit () {
       if (!this.arkoseToken) {
         window.myEnforcement.run();
       }
-    },
-  },
+    }
+  }
 };
 </script>
