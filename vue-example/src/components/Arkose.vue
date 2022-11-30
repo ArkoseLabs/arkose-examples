@@ -1,9 +1,13 @@
 <template>
-  <div v-if="mode === 'inline'" :id="selector"></div>
+  <div
+    v-if="mode === 'inline'"
+    :id="selector?.slice(1)"
+  />
 </template>
 
 <script>
 export default {
+  // eslint-disable-next-line vue/multi-word-component-names
   name: 'Arkose',
   props: {
     publicKey: {
@@ -16,23 +20,30 @@ export default {
     },
     selector: {
       type: String,
-      default: null
+      default: null // Any valid DOM selector is allowed here
     },
     nonce: {
       type: String,
       default: ''
-    },
+    }
+  },
+  data () {
+    return {
+      scriptId: ''
+    };
   },
   methods: {
-    // Append the JS tag to the Document Body.
-    loadScript(publicKey, nonce) {
-      const scriptId = 'arkose-script';
-      const currentScript = document.getElementById(scriptId);
+    removeScript () {
+      const currentScript = document.getElementById(this.scriptId);
       if (currentScript) {
         currentScript.remove();
       }
+    },
+    // Append the JS tag to the Document Body.
+    loadScript (publicKey, nonce) {
+      this.removeScript();
       const script = document.createElement('script');
-      script.id = scriptId;
+      script.id = this.scriptId;
       script.type = 'text/javascript';
       script.src = `https://client-api.arkoselabs.com/v2/${publicKey}/api.js`;
       script.setAttribute('data-callback', 'setupEnforcement');
@@ -44,10 +55,10 @@ export default {
       document.body.appendChild(script);
       return script;
     },
-    setupEnforcement(myEnforcement) {
+    setupEnforcement (myEnforcement) {
       window.myEnforcement = myEnforcement;
       window.myEnforcement.setConfig({
-        selector: this.selector && `#${this.selector}`,
+        selector: this.selector,
         mode: this.mode,
         onReady: () => {
           this.$emit('onReady');
@@ -75,11 +86,12 @@ export default {
         },
         onFailed: (response) => {
           this.$emit('onFailed', response);
-        },
+        }
       });
-    },
+    }
   },
-  mounted() {
+  mounted () {
+    this.scriptId = `arkose-script-${this.publicKey}`;
     const scriptElement = this.loadScript(this.publicKey, this.nonce);
     // This will inject required html and css after the Arkose script is properly loaded
     scriptElement.onload = () => {
@@ -91,14 +103,14 @@ export default {
       console.log('Could not load the Arkose API Script!');
     };
   },
-  destroyed() {
+  destroyed () {
     if (window.myEnforcement) {
-      window.myEnforcement = undefined;
       delete window.myEnforcement;
     }
     if (window.setupEnforcement) {
       delete window.setupEnforcement;
     }
-  },
+    this.removeScript();
+  }
 };
 </script>

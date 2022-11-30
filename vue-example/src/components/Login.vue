@@ -2,16 +2,32 @@
   <div>
     <h2>Login</h2>
     <Arkose
-      :publicKey="publicKey"
+      :public-key="publicKey"
       mode="lightbox"
       @onCompleted="onCompleted($event)"
       @onError="onError($event)"
     />
-    <input type="text" id="email" name="email" placeholder="Email" />
-    <input type="text" id="password" name="password" placeholder="Password" />
-    <input type="submit" @click="onSubmit()" value="Submit" />
+    <input
+      type="text"
+      id="email"
+      name="email"
+      placeholder="Email"
+    >
+    <input
+      type="text"
+      id="password"
+      name="password"
+      placeholder="Password"
+    >
+    <input
+      type="submit"
+      @click="onSubmit()"
+      value="Submit"
+    >
     <nav>
-      <router-link to="/forgot-password">Forgot Password</router-link>
+      <router-link to="/forgot-password">
+        Forgot Password
+      </router-link>
     </nav>
   </div>
 </template>
@@ -21,29 +37,29 @@ import router from '../router.js';
 import Arkose from './Arkose.vue';
 
 export default {
-  name: 'Login',
+  name: 'LoginComponent',
   components: {
-    Arkose,
+    Arkose
   },
-  data() {
+  data () {
     return {
       publicKey: process.env.VUE_APP_ARKOSE_PUBLIC_KEY,
-      arkoseToken: null,
+      arkoseToken: null
     };
   },
   methods: {
-    onCompleted(token) {
+    onCompleted (token) {
       this.arkoseToken = token;
       router.replace({ path: '/dashboard' });
     },
-    onError(errorMessage) {
+    onError (errorMessage) {
       alert(errorMessage);
     },
-    onSubmit() {
+    onSubmit () {
       if (!this.arkoseToken) {
         window.myEnforcement.run();
       }
-    },
-  },
+    }
+  }
 };
 </script>

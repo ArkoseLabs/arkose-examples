@@ -10,20 +10,20 @@ Vue.use(Router);
 export default new Router({
   routes: [
     {
-      path: `/`,
-      name: `login`,
-      component: Login,
+      path: '/',
+      name: 'login',
+      component: Login
     },
     {
-      path: `/forgot-password`,
-      name: `forgot-password`,
-      component: ForgotPassword,
+      path: '/forgot-password',
+      name: 'forgot-password',
+      component: ForgotPassword
     },
     {
-      path: `/dashboard`,
-      name: `dashboard`,
-      component: Dashboard,
-    },
+      path: '/dashboard',
+      name: 'dashboard',
+      component: Dashboard
+    }
   ],
-  mode: `history`,
+  mode: 'history'
 });

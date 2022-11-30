@@ -3,19 +3,20 @@ module.exports = {
     node: true,
     es2021: true
   },
-  extends: ['plugin:react/recommended', 'standard'],
-  overrides: [],
+  extends: [
+    'plugin:vue/strongly-recommended',
+    'standard'
+  ],
+  overrides: [
+  ],
   parserOptions: {
     ecmaVersion: 'latest',
     sourceType: 'module'
   },
-  plugins: ['react'],
+  plugins: [
+    'vue'
+  ],
   rules: {
     semi: ['error', 'always']
-  },
-  settings: {
-    react: {
-      version: 'detect'
-    }
   }
 };

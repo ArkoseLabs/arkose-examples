@@ -2,16 +2,28 @@
   <div>
     <h2>Forgot Password</h2>
     <Arkose
-      :publicKey="publicKey"
+      :public-key="publicKey"
       mode="inline"
-      selector="arkose-ec"
+      selector="#arkose-ec"
       @onCompleted="onCompleted($event)"
       @onError="onError($event)"
     />
-    <input type="text" id="email" name="email" placeholder="Email" />
-    <input type="submit" @click="onSubmit()" value="Submit" :disabled="!arkoseToken" />
+    <input
+      type="text"
+      id="email"
+      name="email"
+      placeholder="Email"
+    >
+    <input
+      type="submit"
+      @click="onSubmit()"
+      value="Submit"
+      :disabled="!arkoseToken"
+    >
     <nav>
-      <router-link to="/">Login</router-link>
+      <router-link to="/">
+        Login
+      </router-link>
     </nav>
   </div>
 </template>
@@ -23,25 +35,25 @@ import Arkose from './Arkose.vue';
 export default {
   name: 'ForgotPassword',
   components: {
-    Arkose,
+    Arkose
   },
-  data() {
+  data () {
     return {
       publicKey: process.env.VUE_APP_ARKOSE_PUBLIC_KEY,
-      arkoseToken: null,
+      arkoseToken: null
     };
   },
   methods: {
-    onCompleted(token) {
+    onCompleted (token) {
       this.arkoseToken = token;
     },
-    onError(errorMessage) {
+    onError (errorMessage) {
       alert(errorMessage);
     },
-    onSubmit() {
+    onSubmit () {
       if (!this.arkoseToken) return;
       router.replace({ path: '/' });
-    },
+    }
   }
 };
 </script>
