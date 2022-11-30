@@ -1,9 +1,13 @@
 <template>
-  <div v-if="mode === 'inline'" :id="selector?.slice(1)"></div>
+  <div
+    v-if="mode === 'inline'"
+    :id="selector?.slice(1)"
+  />
 </template>
 
 <script>
 export default {
+  // eslint-disable-next-line vue/multi-word-component-names
   name: 'Arkose',
   props: {
     publicKey: {
@@ -99,7 +103,7 @@ export default {
       console.log('Could not load the Arkose API Script!');
     };
   },
-  unmounted () {
+  destroyed () {
     if (window.myEnforcement) {
       delete window.myEnforcement;
     }
