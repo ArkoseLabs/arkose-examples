@@ -1,0 +1,93 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Multi Hosted Iframe Test</title>
+    <style>
+      iframe {
+        width: 0px;
+        height: 0px;
+        border: 0 !important;
+        overflow-y: hidden;
+      }
+      body {
+        display: flex;
+        flex-direction: row;
+        gap: 50px;
+      }
+    </style>
+    <script>
+      window.addEventListener('message', function(event) {
+        if (!event.data || typeof event.data === 'object') return;
+        var json_parsed_event = JSON.parse(event.data);
+
+        var key_1 = "11111111-1111-1111-1111-111111111111";
+        var key_2 = "22222222-2222-2222-2222-222222222222";
+
+        switch (json_parsed_event.eventId) {
+          case 'challenge-loaded':
+           if (json_parsed_event.publicKey === key_1) {
+                document.getElementById('arkoseFrame1').style.height =
+                json_parsed_event.payload.frameHeight;
+                document.getElementById('arkoseFrame1').style.width =
+                json_parsed_event.payload.frameWidth;
+            }
+            if (json_parsed_event.publicKey === key_2) {
+                document.getElementById('arkoseFrame2').style.height =
+                json_parsed_event.payload.frameHeight;
+                document.getElementById('arkoseFrame2').style.width =
+                json_parsed_event.payload.frameWidth;
+            }
+            break;
+          case 'challenge-suppressed':
+            break;
+          case 'challenge-complete':
+            if (json_parsed_event.publicKey === key_1) {
+                document.getElementById('token').innerHTML =
+                    json_parsed_event.payload.sessionToken;
+            }
+            if (json_parsed_event.publicKey === key_2) {
+                document.getElementById('token2').innerHTML =
+                    json_parsed_event.payload.sessionToken;            }
+            break;
+          case 'challenge-shown':
+            break;
+          case 'challenge-error':
+            break;
+          case 'challenge-iframeSize':
+            if (json_parsed_event.publicKey === key_1) {
+                document.getElementById('arkoseFrame1').style.height =
+                    json_parsed_event.payload.frameHeight;
+                document.getElementById('arkoseFrame1').style.width =
+                    json_parsed_event.payload.frameWidth;
+            }
+            if (json_parsed_event.publicKey === key_2) {
+                document.getElementById('arkoseFrame2').style.height =
+                    json_parsed_event.payload.frameHeight;
+                document.getElementById('arkoseFrame2').style.width =
+                    json_parsed_event.payload.frameWidth;
+            }
+            break;
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <div>
+      <h3>Key: 11111111-1111-1111-1111-111111111111</h3>
+      <iframe id="arkoseFrame1" src="https://iframe.arkoselabs.com/11111111-1111-1111-1111-111111111111/index.html"></iframe>
+      <p>&nbsp;</p>
+      <div>
+      <p><strong>Session Token:</strong><br /><span id="token">-</span></p>
+      </div>
+    </div>
+    <div>
+      <h3>Key: 22222222-2222-2222-2222-222222222222</h3>
+      <iframe id="arkoseFrame2" src="https://iframe.arkoselabs.com/22222222-2222-2222-2222-222222222222/index.html"></iframe>
+      <p>&nbsp;</p>
+      <div>
+      <p><strong>Session Token:</strong><br /><span id="token2">-</span></p>
+      </div>
+    <div>
+  </body>
+</html>

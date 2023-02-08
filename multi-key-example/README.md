@@ -17,6 +17,12 @@ Start the server
   npm run start
 ```
 
+Start the server with multi iFrame example
+
+```bash
+  npm run start-iframe
+```
+
 Access the page at http://localhost:1234/.
 
 ## Documentation
