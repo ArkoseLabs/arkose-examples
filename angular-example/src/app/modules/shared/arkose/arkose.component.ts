@@ -17,6 +17,7 @@ import { ArkoseScriptService } from '../../../services/arkose-script.service';
 })
 export class ArkoseComponent implements OnInit, OnDestroy {
   @Input() public publicKey: string;
+  @Input() public arkoseMaxRetries: number = 2;
   @Input() public mode?: 'lightbox' | 'inline';
   @Input() public selector?: string;
   @Output() onReady = new EventEmitter();
@@ -29,9 +30,9 @@ export class ArkoseComponent implements OnInit, OnDestroy {
   @Output() onError = new EventEmitter();
   @Output() onFailed = new EventEmitter();
   
-  // Variables for Health Checks
-  private arkoseRetryCount = 0; // Counter for script retries
-  private arkoseMaxRetries = 2; // The number of retries to perform when error (Configurable)
+  // Health Check variables
+  private arkoseRetryCount = 0; // Counter for Arkose retries
+  private arkoseResetting = false;
 
   constructor(
     private renderer: Renderer2,
@@ -95,9 +96,12 @@ export class ArkoseComponent implements OnInit, OnDestroy {
       selector: this.selector && `#${this.selector}`,
       mode: this.mode,
       onReady: () => {
-        this.zone.run(() => {
-          this.onReady.emit();
-        });
+        if (this.arkoseResetting) {
+          this.arkoseResetting = false;
+          this.zone.run(() => {
+            this.onReady.emit();
+          });
+        }
       },
       onShown: () => {
         this.zone.run(() => {
@@ -134,11 +138,8 @@ export class ArkoseComponent implements OnInit, OnDestroy {
       onError: async (response: any) => {
         const arkoseStatus = await this.checkArkoseAPIHealthStatus();
         if (arkoseStatus && this.arkoseRetryCount < this.arkoseMaxRetries) {
+          this.arkoseResetting = true;
           myEnforcement.reset();
-          // To ensure the enforcement has been successfully reset, we need to set a timeout here
-          setTimeout(function () {
-            myEnforcement.run();
-          }, 500);
           this.arkoseRetryCount++;
           return;
         }
