@@ -28,6 +28,10 @@ export class ArkoseComponent implements OnInit, OnDestroy {
   @Output() onHide = new EventEmitter();
   @Output() onError = new EventEmitter();
   @Output() onFailed = new EventEmitter();
+  
+  // Variables for Health Checks
+  private arkoseRetryCount = 0; // Counter for script retries
+  private arkoseMaxRetries = 2; // The number of retries to perform when error (Configurable)
 
   constructor(
     private renderer: Renderer2,
@@ -65,7 +69,26 @@ export class ArkoseComponent implements OnInit, OnDestroy {
     }
   }
 
-  // This is the function that will be called after the Arkose script has loaded
+  /**
+    * Checks the current status of the Arkose Labs platform
+    */
+  async checkArkoseAPIHealthStatus() {
+    try {
+      const healthResponse = await fetch(
+        'https://status.arkoselabs.com/api/v2/status.json'
+      );
+      const healthJson = await healthResponse.json();
+      const status = healthJson.status.indicator;
+      return status === 'none'; // status "none" indicates Arkose systems are healthy
+    } catch (error) {
+      return false;
+    }
+  }
+
+  /**
+   * This is the function that will be called after the Arkose script has loaded
+   * @param myEnforcement Arkose Enforcement object
+   */
   setupEnforcement = (myEnforcement: any) => {
     window.myEnforcement = myEnforcement;
     window.myEnforcement.setConfig({
@@ -108,9 +131,20 @@ export class ArkoseComponent implements OnInit, OnDestroy {
           this.onHide.emit();
         });
       },
-      onError: (response: any) => {
+      onError: async (response: any) => {
+        const arkoseStatus = await this.checkArkoseAPIHealthStatus();
+        if (arkoseStatus && this.arkoseRetryCount < this.arkoseMaxRetries) {
+          myEnforcement.reset();
+          // To ensure the enforcement has been successfully reset, we need to set a timeout here
+          setTimeout(function () {
+            myEnforcement.run();
+          }, 500);
+          this.arkoseRetryCount++;
+          return;
+        }
         this.zone.run(() => {
           this.onError.emit(response);
+          // Error can be handled via this event.
         });
       },
       onFailed: (response: any) => {
