@@ -17,6 +17,7 @@ import { ArkoseScriptService } from '../../../services/arkose-script.service';
 })
 export class ArkoseComponent implements OnInit, OnDestroy {
   @Input() public publicKey: string;
+  @Input() public arkoseMaxRetries: number = 2;
   @Input() public mode?: 'lightbox' | 'inline';
   @Input() public selector?: string;
   @Output() onReady = new EventEmitter();
@@ -28,6 +29,10 @@ export class ArkoseComponent implements OnInit, OnDestroy {
   @Output() onHide = new EventEmitter();
   @Output() onError = new EventEmitter();
   @Output() onFailed = new EventEmitter();
+  
+  // Health Check variables
+  private arkoseRetryCount = 0; // Counter for Arkose retries
+  private arkoseResetting = false;
 
   constructor(
     private renderer: Renderer2,
@@ -65,16 +70,38 @@ export class ArkoseComponent implements OnInit, OnDestroy {
     }
   }
 
-  // This is the function that will be called after the Arkose script has loaded
+  /**
+    * Checks the current status of the Arkose Labs platform
+    */
+  async checkArkoseAPIHealthStatus() {
+    try {
+      const healthResponse = await fetch(
+        'https://status.arkoselabs.com/api/v2/status.json'
+      );
+      const healthJson = await healthResponse.json();
+      const status = healthJson.status.indicator;
+      return status === 'none'; // status "none" indicates Arkose systems are healthy
+    } catch (error) {
+      return false;
+    }
+  }
+
+  /**
+   * This is the function that will be called after the Arkose script has loaded
+   * @param myEnforcement Arkose Enforcement object
+   */
   setupEnforcement = (myEnforcement: any) => {
     window.myEnforcement = myEnforcement;
     window.myEnforcement.setConfig({
       selector: this.selector && `#${this.selector}`,
       mode: this.mode,
       onReady: () => {
-        this.zone.run(() => {
-          this.onReady.emit();
-        });
+        if (this.arkoseResetting) {
+          this.arkoseResetting = false;
+          this.zone.run(() => {
+            this.onReady.emit();
+          });
+        }
       },
       onShown: () => {
         this.zone.run(() => {
@@ -108,9 +135,17 @@ export class ArkoseComponent implements OnInit, OnDestroy {
           this.onHide.emit();
         });
       },
-      onError: (response: any) => {
+      onError: async (response: any) => {
+        const arkoseStatus = await this.checkArkoseAPIHealthStatus();
+        if (arkoseStatus && this.arkoseRetryCount < this.arkoseMaxRetries) {
+          this.arkoseResetting = true;
+          myEnforcement.reset();
+          this.arkoseRetryCount++;
+          return;
+        }
         this.zone.run(() => {
           this.onError.emit(response);
+          // Error can be handled via this event.
         });
       },
       onFailed: (response: any) => {
