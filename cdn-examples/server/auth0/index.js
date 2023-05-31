@@ -23,14 +23,15 @@
  * @param  {string} value The string to parse as a number
  * @return {integer} The parsed integer value
  */
-const parseNumber = (value) => (isNaN(parseInt(value)) ? 0 : parseInt(value));
+const parseNumber = (value) =>
+  isNaN(parseInt(value, 10)) ? 0 : parseInt(value, 10);
 
 /**
  * Parses a boolean like string as a boolean
  * @param  {string} value The string to parse as a boolean
  * @return {boolean} The parsed boolean value
  */
-const parseBoolean = (value) => String(value).toLowerCase() == 'true';
+const parseBoolean = (value) => String(value).toLowerCase() === 'true';
 
 /**
  * Returns a cookie value from a cookie header string
@@ -45,7 +46,7 @@ const getCookie = (cookieString, cookieKey) => {
       cookie.includes(cookieKey)
     );
     if (targetCookie) {
-      const [_, value] = targetCookie.split(`${cookieKey}=`);
+      const [, value] = targetCookie.split(`${cookieKey}=`);
       return value;
     }
   }
@@ -113,7 +114,7 @@ const verifyArkoseToken = async (
       if (currentRetry === retryMaxCount) {
         return { verified, arkoseStatus };
       }
-      return await verifyArkoseToken(
+      return verifyArkoseToken(
         token,
         privateKey,
         verifySubdomain,
@@ -132,32 +133,20 @@ const verifyArkoseToken = async (
  */
 const handleFailure = (errorUrl) => {
   return Response.redirect(errorUrl, '301');
-}
+};
 
 export default {
-  async fetch(request, env, ctx) {
+  async fetch(request, env) {
     const { publicKey } = env;
     const { privateKey } = env;
     const { clientSubdomain = 'client-api' } = env;
     const { verifySubdomain = 'client-api' } = env;
     const { errorUrl } = env;
-    const { cookieName = 'arkose-session' } = env;
+    const { cookieName = 'arkose-token' } = env;
     const formSelector = '._form-login-password';
     const failOpen = parseBoolean(env.failOpen);
     const verifyMaxRetryCount = parseNumber(env.verifyMaxRetryCount);
     const scriptMaxRetryCount = parseNumber(env.scriptMaxRetryCount);
-
-    /**
-     * Checks the current response and if it should have Arkose injected
-     * @param  {Object} response The current response to check
-     * @return  {Object} the modified response
-     */
-    const checkResponse = (response) => {
-      if (response.status === 302) {
-        return response;
-      }
-      return injectArkose(response);
-    };
 
     /**
      * Injects the Arkose Labs Client-API code into the current response
@@ -165,7 +154,7 @@ export default {
      * @return  {Object} the modified response
      */
     const injectArkose = (response) => {
-      var newResponse = new HTMLRewriter()
+      const newResponse = new HTMLRewriter()
         .on('body', {
           element(element) {
             element.append(
@@ -283,8 +272,20 @@ createArkoseScript();
       return newResponse;
     };
 
+    /**
+     * Checks the current response and if it should have Arkose injected
+     * @param  {Object} response The current response to check
+     * @return  {Object} the modified response
+     */
+    const checkResponse = (response) => {
+      if (response.status === 302) {
+        return response;
+      }
+      return injectArkose(response);
+    };
+
     // If the request is a GET request inject the Arkose Labs Client-API script
-    if (request.method == 'GET') {
+    if (request.method === 'GET') {
       const res = await fetch(request);
       return injectArkose(res);
     }
