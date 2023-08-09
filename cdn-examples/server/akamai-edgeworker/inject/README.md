@@ -2,7 +2,7 @@
 This example pattern utilises an EdgeWorker to inject Arkose into a HTML file. Using Akamai's `responseProvider`, a HTML file is fetched and then the required code to setup an Arkose Challenge is injected. There are a multiple configurable variables required, which can be found [here](#configuration).
 
 ## Configuration
-This worker includes several environment variables that can be setup to customise the behaviour of the worker.
+This worker includes several variables that can be setup to customise the behaviour of the worker.
 
 | Variable              | Description                                                           | Default                                |
 | --------------------- | --------------------------------------------------------------------- | -------------------------------------- |
