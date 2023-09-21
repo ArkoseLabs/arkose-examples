@@ -82,7 +82,7 @@ const checkArkoseStatus = async () => {
  * @param  {string} [currentRetry=0] The count of the current number of retries being performed
  * @return {Object} status The current verification and Arkose Labs platform status
  * @return {boolean} status.verified Has the token verified successfully
- * @return {boolean} statis.arkoseStatus The current status of the Arkose Labs platform
+ * @return {boolean} status.arkoseStatus The current status of the Arkose Labs platform
  */
 const verifyArkoseToken = async (
   token,
