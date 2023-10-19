@@ -1,3 +1,6 @@
+import { Buffer } from 'node:buffer';
+
+
 /**
  * Example code for a Cloudflare Worker that can proxy Auth0 requests and inject an
  * Arkose Labs integration into and then process the Arkose Labs result on the
@@ -9,15 +12,16 @@
  * @param {string} clientSubdomain A customer's specific subdomain used for the loading of the Client-API (if setup)
  * @param {string} verifySubdomain A customer's specific subdomain used for the verification call (if setup)
  * @param {string} errorUrl A url to redirect to if there has been an error
- * @param {string} arkoseCookieLife  The length of time the Arkose cookies should be active for (in milliseconds) 
-|* @param {string} arkoseCookieName The name of the cookie that the Arkose token will be stored in
-|* @param {string} arkoseErrorCookieName The name of the cookie that an Arkose error will be stored in
+ * @param {string} cookieName The name of the cookie to store the Arkose Labs session token in
+ * @param {string} failOpen A boolean string to indicate if the current session should fail
+ * open if there is a problem with the Arkose Labs platform.
  * @param {string} verifyMaxRetryCount A numeric string to represent the number of times we should retry
  * Arkose Labs verification if there is an issue.
  * @param {string} scriptMaxRetryCount A numeric string to represent the number of times we should retry
  * loading an Arkose Labs challenge if there is an issue.
- * * @param {string} failOpen A boolean string to indicate if the current session should fail
- * open if there is a problem with the Arkose Labs platform.
+ * @param {string} usingDX A boolean string to indicate if Data Exchange is being sed
+ * @param {string} tokenEnforcement A boolean string to indicate if Token Enforcemeent is enabled
+ * @param {string} secretKeyBase64 A string with the base64 private encryption key
  */
 
 /**
@@ -82,7 +86,7 @@ const checkArkoseStatus = async () => {
  * @param  {string} [currentRetry=0] The count of the current number of retries being performed
  * @return {Object} status The current verification and Arkose Labs platform status
  * @return {boolean} status.verified Has the token verified successfully
- * @return {boolean} status.arkoseStatus The current status of the Arkose Labs platform
+ * @return {boolean} statis.arkoseStatus The current status of the Arkose Labs platform
  */
 const verifyArkoseToken = async (
   token,
@@ -137,6 +141,71 @@ const handleFailure = (errorUrl) => {
   return Response.redirect(errorUrl, '301');
 };
 
+
+/**
+ * Handles encryption of the blob to pass via Data Exchange
+ * @param  {ArrayBuffer} keyBytes An ArrayBuffer containing the shared secret key
+ * @param  {string} data A Json string containing the raw contents to be encrypted
+ * @return {Uint8Array,ArrayBuffer} The response containing the iv and Ciphertext values 
+ */
+const encrypt = async (keyBytes, data) => {
+  const buffer = new Uint8Array(12);
+  const result = crypto.getRandomValues(buffer)
+  const enc = new TextEncoder()
+  const tagLength = 128 // 128 bits = 16 bytes/chars
+  const iv = result // 12 bytes/chars = 96 bits
+  const algorithm = {
+    name: 'AES-GCM',
+    iv,
+    tagLength,
+  } 
+  const importedKey = await crypto.subtle
+   .importKey('raw', keyBytes, 'AES-GCM', false, [
+     'encrypt',
+   ])
+  const ciphertext = await crypto.subtle.encrypt(
+    algorithm,
+    importedKey,
+    enc.encode(data),
+  )
+  return {
+    iv,
+    ciphertext,
+  }
+}
+
+
+/**
+ * Handles the encodng of the values into base64 from the Buffer
+ * @param  {ArrayBuffer} iv The Buffer containing the iv
+ * @param  {ArrayBuffer} ciphertext The Buffer containg the ciphertext
+ * @return {string} The response containing the base64 values
+ */
+const encode = (iv, ciphertext) => {
+  const b64iv =  Buffer.from(iv).toString('base64')
+  const b64ciphertext = Buffer.from(ciphertext).toString('base64')
+  return `${b64iv}.${b64ciphertext}`;
+  }
+  
+  /**
+ * Handles parsing of the data to create the Object ready to pss for encoding
+ * @param  {ArrayBuffer} secretKey An ArrayBuffer containing the shared secret key
+ * @param  {string} username A string value containing the username to be included in the blob
+ * @return {Object} 
+ */
+  const dataExchangeHandler = async (secretKey,username) => {
+    const dataExchangeData = {
+      timestamp: new Date().valueOf(),
+      email: username,
+      app: "web-login"
+    }
+    const { iv, ciphertext } = await encrypt(
+      secretKey,
+      JSON.stringify(dataExchangeData)
+    )   
+    return ({encodedData: encode(iv, ciphertext)})
+}
+
 export default {
   async fetch(request, env) {
     const { publicKey } = env;
@@ -150,6 +219,10 @@ export default {
     const failOpen = parseBoolean(env.failOpen);
     const verifyMaxRetryCount = parseNumber(env.verifyMaxRetryCount);
     const scriptMaxRetryCount = parseNumber(env.scriptMaxRetryCount);
+    const usingDX = parseBoolean(env.DX);
+    const tokenEnforcement = parseBoolean(env.tokenEnforcement);
+    const  { secretKeyBase64 } = env;
+    const secretKey = new Uint8Array(Buffer.from(secretKeyBase64, 'base64'))
 
     /**
      * Injects the Arkose Labs Client-API code into the current response
@@ -157,7 +230,15 @@ export default {
      * @return  {Object} the modified response
      */
     
-    const injectArkose = (response) => {
+    const injectArkose = async (response,username) => {
+      var blob;
+      if (usingDX) {
+        blob = await dataExchangeHandler(secretKey,username);
+      }
+      else {
+        blob = "";
+      }
+
       const newResponse = new HTMLRewriter()
         .on('body', {
           element(element) {
@@ -249,6 +330,9 @@ export default {
               function setupEnforcement(myEnforcement) {
                   arkose = myEnforcement;
                   arkose.setConfig({
+                      data: {
+                        blob: "${blob.encodedData}"
+                      },
                       onReady: function() {
                           arkoseReady = true;
                           if (submitButton) {
@@ -321,10 +405,26 @@ export default {
       return injectArkose(response);
     };
 
+
+
     // If the request is a GET request inject the Arkose Labs Client-API script
+    // If DX is being used, find the email address from the response.
     if (request.method === 'GET') {
+      if (usingDX){
+      const originalResponse = await fetch(request);
+      const originalBody = await originalResponse.text();
+      const position = originalBody.search('name="username" value="');
+      const endpositon = originalBody.indexOf('"', position+23);
+      const username = originalBody.substring(position+23, endpositon);
+
       const res = await fetch(request);
-      return injectArkose(res);
+      return injectArkose(res, username);
+      }
+      else {
+        const res = await fetch(request);
+        const username = "";
+      return injectArkose(res, username);
+      }
     }
     // If the request is not a GET request and has an Arkose Labs session cookie, process it
     const arkoseToken = getCookie(request.headers.get('Cookie'), arkoseCookieName);
@@ -348,9 +448,21 @@ export default {
         return checkResponse(response);
       }
       // If session is not verified and Arkose does not have an outage, handle failure
-      return handleFailure(errorUrl);
+      if (tokenEnforcement){
+        return handleFailure(errorUrl);
+      }
+      else {
+        const response = await fetch(request);
+        return checkResponse(response);
+      }
     }
     // If no token is found, handle failure
-    return handleFailure(errorUrl);
+    if (tokenEnforcement){
+      return handleFailure(errorUrl);
+    }
+    else {
+      const response = await fetch(request);
+      return checkResponse(response);
+    }
   },
 };
