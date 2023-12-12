@@ -18,6 +18,6 @@ This worker includes several environment variables that can be setup to customis
 | scriptMaxRetryCount   | The number of times to retry resetting Arkose if there is a client side error        |                | `3`                                         |
 | verifyMaxRetryCount   | The number of times to retry verification if there is an error                       |                | `3`                                         |
 | failOpen              | A boolean to indicate if we should fail open or not in case of outage                |                | `true`                                      |
-| tokenEnforcement      | A Boolean to indicate whether to handle a failure on Arkose. Can be useful to help initial setup by setting to false.        | `true`                                 |
+| tokenEnforcement      | A boolean to indicate whether to handle a failure on Arkose. Can be useful to help initial setup by setting to false.        | `true`                                 |
 | usingDX               | A boolean to indicate if Data Exchange is to be enabled                              |                | `true`                                      |  
 | secretKeyBase64       | A secret string in which the data to be exchanged will be encoded. Must be 44 characters long.                    |                | `secret string`                            |
