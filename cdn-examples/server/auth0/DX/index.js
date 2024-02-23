@@ -22,7 +22,7 @@
  * @param {string} tokenEnforcement A boolean string to indicate if Token Enforcement is enabled
  * @param {string} secretKeyBase64 A string with the base64 private encryption key. This value must be 44 characters long.
  */
-
+import { Buffer } from 'node:buffer';
 /**
  * Parses a numeric string as a number
  * @param  {string} value The string to parse as a number
