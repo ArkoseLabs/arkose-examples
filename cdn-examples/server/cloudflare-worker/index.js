@@ -7,6 +7,7 @@
  * @param {string} privateKey The Arkose Labs private key to use for verification
  * @param {string} verifySubdomain A customer's specific subdomain used for the verification call (if setup)
  * @param {string} errorUrl A url to redirect to if there has been an error
+ * IMPORTANT: Before using, set 'errorUrl' to the URL for error redirection
  * @param {string} tokenMethod The storage method of the Arkose Labs token, this can be either "header" or "cookie".
  * @param {string} tokenIdentifier The property name for the header / cookie that contains the Arkose Labs token
  * @param {string} failOpen A boolean string to indicate if the current session should fail
@@ -155,7 +156,7 @@ const getArkoseToken = (request, tokenMethod, tokenIdentifier) => {
  * @return {Object} The response to handle the error
  */
 const handleFailure = (errorUrl) => {
-  return Response.redirect(errorUrl, '301');
+  return Response.redirect(errorUrl, '301'); // Set this to your error handling URL
 };
 
 
@@ -163,7 +164,7 @@ export default {
   async fetch(request, env) {
     const { privateKey } = env;
     const { verifySubdomain = 'client-api' } = env;
-    const { errorUrl } = env;
+    const { errorUrl } = env; // Set this to your error handling URL
     const { tokenIdentifier = 'arkose-token' } = env;
     const { tokenMethod = 'header' } = env;
     const failOpen = parseBoolean(env.failOpen);
@@ -194,9 +195,9 @@ export default {
       }
 
       // If session is not verified and Arkose does not have an outage, handle failure
-      return handleFailure(errorUrl);
+      return handleFailure(errorUrl); // Set this to your error handling URL
     }
     // If no token is found, handle failure
-    return handleFailure(errorUrl);
+    return handleFailure(errorUrl); // Set this to your error handling URL
   },
 };
