@@ -9,6 +9,7 @@
  * @param {string} clientSubdomain A customer's specific subdomain used for the loading of the Client-API (if setup)
  * @param {string} verifySubdomain A customer's specific subdomain used for the verification call (if setup)
  * @param {string} errorUrl A url to redirect to if there has been an error
+ * IMPORTANT: Before using, set 'errorUrl' to the URL for error redirection
  * @param {string} arkoseCookieLife  The length of time the Arkose cookies should be active for (in milliseconds) 
 |* @param {string} arkoseCookieName The name of the cookie that the Arkose token will be stored in
 |* @param {string} arkoseErrorCookieName The name of the cookie that an Arkose error will be stored in
@@ -131,10 +132,11 @@ const verifyArkoseToken = async (
 /**
  * Handles failures to verify and redirects to a specified url
  * @param  {string} errorUrl A string representing a url to redirect to on failure
+ * IMPORTANT: Before using, set 'errorUrl' to the URL for error redirection
  * @return {Object} The response to handle the error
  */
 const handleFailure = (errorUrl) => {
-  return Response.redirect(errorUrl, '301');
+  return Response.redirect(errorUrl, '301'); // Set this to your error handling URL
 };
 
 export default {
@@ -143,7 +145,7 @@ export default {
     const { privateKey } = env;
     const { clientSubdomain = 'client-api' } = env;
     const { verifySubdomain = 'verify-api' } = env;
-    const { errorUrl } = env;
+    const { errorUrl } = env; // Set this to your error handling URL
     const { arkoseCookieName = 'arkoseToken' } = env;
     const { arkoseErrorCookieName = 'arkoseError' } = env;
     const arkoseCookieLife = parseNumber(env.arkoseCookieLife);
@@ -348,9 +350,9 @@ export default {
         return checkResponse(response);
       }
       // If session is not verified and Arkose does not have an outage, handle failure
-      return handleFailure(errorUrl);
+      return handleFailure(errorUrl); // Set this to your error handling URL
     }
     // If no token is found, handle failure
-    return handleFailure(errorUrl);
+    return handleFailure(errorUrl); // Set this to your error handling URL
   },
 };

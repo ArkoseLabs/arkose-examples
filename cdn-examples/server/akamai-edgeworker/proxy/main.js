@@ -5,6 +5,7 @@
  * This requires the following variables being setup for the Akamai Property User variables
  * @param {string} privateKey The Arkose Labs private key to use for verification
  * @param {string} errorUrl A url to redirect to if there has been an error
+ * IMPORTANT: Before using, set 'errorUrl' to the URL for error redirection
  * @param {string} tokenIdentifier The property name for the header / cookie that contains the Arkose Labs token
  * @param {string} tokenMethod The storage method of the Arkose Labs token, this can be either "header" or "cookie".
  * @param {string} failOpen A boolean string to indicate if the current session should fail
@@ -140,7 +141,7 @@ const getArkoseToken = (request, tokenMethod, tokenIdentifier) => {
 
 export async function responseProvider(request) {
   const privateKey = request.getVariable('PMUSER_ARKOSE_PRIVATE_KEY');
-  const errorUrl = request.getVariable('PMUSER_ERROR_URL');
+  const errorUrl = request.getVariable('PMUSER_ERROR_URL'); // Set this to your error handling URL
   const tokenIdentifier = request.getVariable('PMUSER_TOKEN_IDENTIFIER');
   const tokenMethod = request.getVariable('PMUSER_TOKEN_METHOD');
   const failOpen = parseBoolean(request.getVariable('PMUSER_FAIL_OPEN'));
@@ -198,10 +199,10 @@ export async function responseProvider(request) {
     // If session is not verified and Arkose does not have an outage, handle failure
     return createResponse(
       302,
-      { Location: [errorUrl] },
+      { Location: [errorUrl] }, // Set this to your error handling URL
       'Session is not verified and Arkose is healthy'
     );
   }
   // If no token is found, handle failure
-  return createResponse(302, { Location: [errorUrl] }, 'No token found');
+  return createResponse(302, { Location: [errorUrl] }, 'No token found'); // Set this to your error handling URL
 }

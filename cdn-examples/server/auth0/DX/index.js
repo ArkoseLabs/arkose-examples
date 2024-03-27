@@ -11,6 +11,7 @@
  * @param {string} clientSubdomain A customer's specific subdomain used for the loading of the Client-API (if setup)
  * @param {string} verifySubdomain A customer's specific subdomain used for the verification call (if setup)
  * @param {string} errorUrl A url to redirect to if there has been an error
+ * IMPORTANT: Before using, set 'errorUrl' to the URL for error redirection
  * @param {string} cookieName The name of the cookie to store the Arkose Labs session token in
  * @param {string} failOpen A boolean string to indicate if the current session should fail
  * open if there is a problem with the Arkose Labs platform.
@@ -134,10 +135,11 @@ const verifyArkoseToken = async (
 /**
  * Handles failures to verify and redirects to a specified url
  * @param  {string} errorUrl A string representing a url to redirect to on failure
+ * IMPORTANT: Before using, set 'errorUrl' to the URL for error redirection
  * @return {Object} The response to handle the error
  */
 const handleFailure = (errorUrl) => {
-  return Response.redirect(errorUrl, '301');
+  return Response.redirect(errorUrl, '301'); // Set this to your error handling URL
 };
 
 /**
@@ -242,7 +244,7 @@ export default {
     const { privateKey } = env;
     const { clientSubdomain = 'client-api' } = env;
     const { verifySubdomain = 'verify-api' } = env;
-    const { errorUrl } = env;
+    const { errorUrl } = env; // Set this to your error handling URL
     const { arkoseCookieName = 'arkoseToken' } = env;
     const { arkoseErrorCookieName = 'arkoseError' } = env;
     const arkoseCookieLife = parseNumber(env.arkoseCookieLife);
@@ -465,14 +467,14 @@ export default {
       }
       // If session is not verified and Arkose does not have an outage, handle failure
       if (tokenEnforcement) {
-        return handleFailure(errorUrl);
+        return handleFailure(errorUrl); // Set this to your error handling URL
       }
       const response = await fetch(request);
       return checkResponse(response);
     }
     // If no token is found, handle failure
     if (tokenEnforcement) {
-      return handleFailure(errorUrl);
+      return handleFailure(errorUrl); // Set this to your error handling URL
     }
     const response = await fetch(request);
     return checkResponse(response);
