@@ -214,8 +214,7 @@ const dataExchangeHandler = async (secretKey, username) => {
 /**
  * Retrieves the username from the request body.
  * @param {Request} request The request that contains the username
- * @returns {Object} Returns object of the username value in the body of the request - empty string if not present
- * and the response
+ * @returns {string} Returns the username value from the body of the request - empty string if not present
  */
 const retrieveUsername = async (response) => {
   const usernameBodyText = 'name="username" value="';
@@ -235,7 +234,7 @@ const retrieveUsername = async (response) => {
     endPosition
   );
 
-  return { username, response };
+  return { username };
 };
 
 export default {
@@ -423,23 +422,24 @@ export default {
 
     /**
      * Checks the current response and if it should have Arkose injected
-     * @param  {Object} response The current response to check
      * @return  {Object} the modified response
      */
-    const checkResponse = (response) => {
+    const checkResponse = async () => {
+      const newRequest = request.clone();
+      const response = await fetch(request);
       if (response.status === 302) {
         return response;
       }
-      return injectArkose(response);
+
+      const forwardingResponse = await fetch(newRequest);
+      const username = usingDX ? await retrieveUsername(forwardingResponse) : '';
+      return injectArkose(response,username);
     };
 
     // If the request is a GET request inject the Arkose Labs Client-API script
     // If DX is being used, find the email address from the response.
     if (request.method === 'GET') {
-      const response = await fetch(request);
-      const username = usingDX ? await retrieveUsername(response) : '';
-      const forwardingResponse = await fetch(request);
-      return injectArkose(forwardingResponse, username);
+      checkResponse();
     }
     // If the request is not a GET request and has an Arkose Labs session cookie, process it
     const arkoseToken = getCookie(
@@ -456,27 +456,23 @@ export default {
 
       // If session is verified, continue with response
       if (verifyStatus.verified) {
-        const response = await fetch(request);
-        return checkResponse(response);
+        return checkResponse();
       }
 
       // If Arkose has an outage and failOpen is configured to true, continue with response
       if (!verifyStatus.arkoseStatus && failOpen) {
-        const response = await fetch(request);
-        return checkResponse(response);
+        return checkResponse();
       }
       // If session is not verified and Arkose does not have an outage, handle failure
       if (tokenEnforcement) {
         return handleFailure(errorUrl); // Set this to your error handling URL
       }
-      const response = await fetch(request);
-      return checkResponse(response);
+      return checkResponse();
     }
     // If no token is found, handle failure
     if (tokenEnforcement) {
       return handleFailure(errorUrl); // Set this to your error handling URL
     }
-    const response = await fetch(request);
-    return checkResponse(response);
+    return checkResponse();
   },
 };
