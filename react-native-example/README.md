@@ -46,7 +46,13 @@ npm run android
 If everything is set up correctly, you should see the app running in your Android Emulator / iOS Simulator.
 
 If you receive errors from iOS, you may need to disable "flipper" in the iOS pod file. This can be done by 
-commenting out line 43 of [ios/Podfile](ios/Podfile)
+commenting out line 43 of [ios/Podfile](ios/Podfile) and then running the following again:
+
+```
+cd ios
+pod install
+cd ..
+```
 
 # Configuration
 
