@@ -23,7 +23,7 @@ chmod 755 gradlew
 cd ..
 ```
 
-Note: This example application was built for JSDK 19 and below, we recommend using that version for running this application.
+Note: This example application was built for JDK 19 and below, we recommend using that version for running this application.
 
 ## Start the application
 
