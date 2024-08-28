@@ -7,6 +7,7 @@ import { createStyles, maxWidth } from 'react-native-media-queries';
 
 import {
   SafeAreaView,
+  ScrollView,
   Text,
   useColorScheme,
   View,
@@ -47,14 +48,15 @@ const App = () => {
       <View style={ style.textContainer }>
         <Text style={ style.text }>Arkose Demo App</Text>
       </View>
+      <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 50 }}>
       <View style={ style.ecContainer }>
         <WebView
-          androidHardwareAccelerationDisabled
-          androidLayerType="software"
+          androidLayerType="hardware"
           source={ { html } }
           onMessage={ arkoseMessageHandler }
         />
       </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -62,8 +64,6 @@ const App = () => {
 const styles = {
 
   ecContainer: {
-    position: 'absolute',
-    top: 110,
     minHeight: 500,
     maxHeight: 600,
     justifyContent: 'center',
@@ -72,7 +72,6 @@ const styles = {
     overflow: 'auto',
     minWidth: 300,
     width: '100%',
-    zIndex: 10,
   },
   textContainer: {
     height: 100,
