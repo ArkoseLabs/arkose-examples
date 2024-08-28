@@ -23,6 +23,8 @@ chmod 755 gradlew
 cd ..
 ```
 
+Note: This example application was built for JSDK 19 and below, we recommend using that version for running this application.
+
 ## Start the application
 
 Once setup as above you can use the following commands to run the application from the base path of the application directory.
