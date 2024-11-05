@@ -1,107 +1,125 @@
-import React from 'react';
+import React, { useMemo, forwardRef, useImperativeHandle, useCallback } from 'react';
 import PropTypes from 'prop-types';
 
-export default class Arkose extends React.Component {
-  constructor () {
-    super();
-    this.myEnforcement = null;
-    this.scriptId = '';
-  }
+import { useLoadScript } from '../customHooks/useLoadScript';
+import { useEnforcement } from '../customHooks/useEnforcement';
 
-  removeScript = () => {
-    const currentScript = document.getElementById(this.scriptId);
-    if (currentScript) {
-      currentScript.remove();
-    }
-  };
+function ArkoseFunc (props, ref) {
+  const {
+    publicKey,
+    nonce,
+    selector,
+    mode,
+    retries,
+    retryDelay,
+    timeout,
+    onReady,
+    onShown,
+    onShow,
+    onSuppress,
+    onCompleted,
+    onReset,
+    onHide,
+    onError,
+    onFailed
+  } = props;
 
-  // Append the JS tag to the Document Body.
-  loadScript = () => {
-    this.removeScript();
-    const script = document.createElement('script');
-    script.id = this.scriptId;
-    script.type = 'text/javascript';
-    script.src = `https://client-api.arkoselabs.com/v2/${this.props.publicKey}/api.js`;
-    script.setAttribute('data-callback', 'setupEnforcement');
-    script.async = true;
-    script.defer = true;
-    if (this.props.nonce) {
-      script.setAttribute('data-nonce', this.props.nonce);
-    }
-    document.body.appendChild(script);
-    return script;
-  };
+  const scriptAttributes = useMemo(
+    () => ({
+      'data-callback': 'setupEnforcement',
+      ...(nonce && { 'data-nonce': nonce })
+    }),
+    [nonce]
+  );
 
-  setupEnforcement = (myEnforcement) => {
-    this.myEnforcement = myEnforcement;
-    this.myEnforcement.setConfig({
-      selector: this.props.selector,
-      mode: this.props.mode,
-      onReady: () => {
-        this.props.onReady();
-      },
-      onShown: () => {
-        this.props.onShown();
-      },
-      onShow: () => {
-        this.props.onShow();
-      },
-      onSuppress: () => {
-        this.props.onSuppress();
-      },
-      onCompleted: (response) => {
-        this.props.onCompleted(response.token);
-      },
-      onReset: () => {
-        this.props.onReset();
-      },
-      onHide: () => {
-        this.props.onHide();
-      },
-      onError: (response) => {
-        this.props.onError(response?.error);
-      },
-      onFailed: (response) => {
-        this.props.onFailed(response);
+  const { status: scriptStatus, dataCallback: scriptDataCallback } = useLoadScript({
+    url: `https://client-api.arkoselabs.com/v2/${publicKey}/api.js`,
+    attributes: scriptAttributes,
+    retries,
+    retryDelay,
+    timeout
+  });
+    // Memoize the callbacks individually at the top level
+  const memoizedOnReady = useCallback(onReady, [onReady]);
+  const memoizedOnShown = useCallback(onShown, [onShown]);
+  const memoizedOnShow = useCallback(onShow, [onShow]);
+  const memoizedOnSuppress = useCallback(onSuppress, [onSuppress]);
+  const memoizedOnCompleted = useCallback(onCompleted, [onCompleted]);
+  const memoizedOnReset = useCallback(onReset, [onReset]);
+  const memoizedOnHide = useCallback(onHide, [onHide]);
+  const memoizedOnError = useCallback(onError, [onError]);
+  const memoizedOnFailed = useCallback(onFailed, [onFailed]);
+
+  // Memoize configProps using useMemo
+  const configProps = useMemo(
+    () => ({
+      selector,
+      mode,
+      onReady: memoizedOnReady,
+      onShown: memoizedOnShown,
+      onShow: memoizedOnShow,
+      onSuppress: memoizedOnSuppress,
+      onCompleted: memoizedOnCompleted,
+      onReset: memoizedOnReset,
+      onHide: memoizedOnHide,
+      onError: memoizedOnError,
+      onFailed: memoizedOnFailed
+    }),
+    [
+      selector,
+      mode,
+      memoizedOnReady,
+      memoizedOnShown,
+      memoizedOnShow,
+      memoizedOnSuppress,
+      memoizedOnCompleted,
+      memoizedOnReset,
+      memoizedOnHide,
+      memoizedOnError,
+      memoizedOnFailed
+    ]
+  );
+
+  const { status: enforcementStatus, enforcement } = useEnforcement({
+    scriptStatus,
+    scriptDataCallback,
+    configProps,
+    retries,
+    timeout
+  });
+
+  // Expose methods via ref
+  useImperativeHandle(ref, () => ({
+    run: () => {
+      if (enforcement) {
+        enforcement.run();
+      } else {
+        console.error('Arkose enforcement is not ready yet.');
       }
-    });
-  };
-
-  componentDidMount () {
-    this.scriptId = `arkose-script-${this.props.publicKey}`;
-    const scriptElement = this.loadScript();
-    // This will inject required html and css after the Arkose script is properly loaded
-    scriptElement.onload = () => {
-      console.log('Arkose API Script loaded');
-      window.setupEnforcement = this.setupEnforcement.bind(this);
-    };
-    // If there is an error loading the Arkose script this callback will be called
-    scriptElement.onerror = () => {
-      console.log('Could not load the Arkose API Script!');
-    };
-  }
-
-  componentWillUnmount () {
-    if (window.setupEnforcement) {
-      delete window.setupEnforcement;
     }
-    this.removeScript();
+  }));
+
+  if (scriptStatus === 'error' || enforcementStatus === 'error') {
+    return <div>Error loading Arkose Labs challenge.</div>;
   }
 
-  render () {
-    return (
-      <>
-        {this.props.mode === 'inline' && <div id={this.props?.selector?.slice(1)}></div>}
-      </>
-    );
-  }
-}
+  return (
+    <>
+      {mode === 'inline' && <div id={selector?.slice(1)}></div>}
+    </>
+  );
+};
 
-Arkose.propTypes = {
+const Arkose = forwardRef(ArkoseFunc);
+
+ArkoseFunc.propTypes = {
   publicKey: PropTypes.string.isRequired,
   mode: PropTypes.oneOf(['inline', 'lightbox']),
-  selector: PropTypes.string, // Any valid DOM selector is allowed here
+  selector: PropTypes.string,
   nonce: PropTypes.string,
+  retries: PropTypes.number,
+  retryDelay: PropTypes.number,
+  timeout: PropTypes.number,
   onReady: PropTypes.func,
   onShown: PropTypes.func,
   onShow: PropTypes.func,
@@ -113,7 +131,11 @@ Arkose.propTypes = {
   onFailed: PropTypes.func
 };
 
-Arkose.defaultProps = {
+ArkoseFunc.defaultProps = {
+  mode: 'lightbox',
+  selector: '#arkose-enforcement-container',
+  retries: 3,
+  timeout: 7000, // 7 seconds
   onReady: () => {},
   onShown: () => {},
   onShow: () => {},
@@ -124,3 +146,9 @@ Arkose.defaultProps = {
   onError: () => {},
   onFailed: () => {}
 };
+
+// Also assign propTypes and defaultProps to the outer component
+Arkose.propTypes = ArkoseFunc.propTypes;
+Arkose.defaultProps = ArkoseFunc.defaultProps;
+
+export default Arkose;
