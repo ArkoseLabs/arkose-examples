@@ -10,7 +10,11 @@ const Login = () => {
 
   const onSubmit = () => {
     if (!token) {
-      arkoseRef.current.myEnforcement.run();
+      if (arkoseRef.current && arkoseRef.current.run) {
+        arkoseRef.current.run();
+      } else {
+        console.error('Arkose is not ready yet.');
+      }
       return;
     }
     navigate('/dashboard');
@@ -30,7 +34,7 @@ const Login = () => {
     <>
       <h2>Login</h2>
       <input type="text" id="email" name="email" placeholder="Email" />
-      <input type="text" id="password" name="password" placeholder="Password" />
+      <input type="password" id="password" name="password" placeholder="Password" />
       <button onClick={onSubmit}>Login</button>
       <br />
       <Link to="/forgot-password">Forgot Password</Link>
@@ -38,9 +42,13 @@ const Login = () => {
         publicKey={publicKey}
         onCompleted={onCompleted}
         onError={onError}
+        retries={3}
+        timeout={7000} // 7 seconds
+        retryDelay={500} // 0.5 seconds
         ref={arkoseRef}
       />
     </>
   );
 };
+
 export default Login;
