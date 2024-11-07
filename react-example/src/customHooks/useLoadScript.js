@@ -67,7 +67,7 @@ export function useLoadScript (options) {
         handleFailure(`${timeout}ms timeout elapsed loading third-party script: ${url}`);
       }, timeout);
 
-      document.body.appendChild(script);
+      document.head.appendChild(script);
     };
 
     loadScript();
