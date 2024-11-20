@@ -21,7 +21,7 @@ import { ArkoseChallenge } from './components/ArkoseChallenge';
   Replace the following variables with the public key and
   hostname (if applicable) that has been setup for your account
 */
-const ARKOSE_PUBLIC_KEY = '11111111-1111-1111-1111-111111111111';
+const ARKOSE_PUBLIC_KEY = '<YOUR_PUBLIC_KEY>';
 const ARKOSE_HOSTNAME = 'https://client-api.arkoselabs.com';
 
 const App = () => {

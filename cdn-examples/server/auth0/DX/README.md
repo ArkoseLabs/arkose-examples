@@ -7,8 +7,8 @@ This worker includes several environment variables that can be setup to customis
 
 | Variable              | Description                                                                          | Default        | Example Format                              |
 | --------------------- | ------------------------------------------------------------------------------------ | -------------- | ------------------------------------------- |
-| publicKey             | The Arkose public key to use in this worker, available via the portal                |                | `11111111-1111-1111-1111-111111111111`      |
-| privateKey            | The Arkose private key to use in this worker, available via the portal               |                | `11111111-1111-1111-1111-111111111111`      |
+| publicKey             | The Arkose public key to use in this worker, available via the portal                |                | `public-key`      |
+| privateKey            | The Arkose private key to use in this worker, available via the portal               |                | `private-key`     |
 | clientSubdomain       | Client subdomain name provided to you via the Arkose Labs team                       | `client-api`   |                                             |
 | verifySubdomain       | Verify subdomain name provided to you via Arkose Labs team                           | `verify-api`   |                                             |
 | errorUrl              | A page to route the user to when an error occurs (outside of fail open)              |                | `"https://www.arkoselabs.com"`              |

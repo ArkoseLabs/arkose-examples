@@ -21,8 +21,9 @@
         if (!event.data || typeof event.data === 'object') return;
         var json_parsed_event = JSON.parse(event.data);
 
-        var key_1 = "11111111-1111-1111-1111-111111111111";
-        var key_2 = "22222222-2222-2222-2222-222222222222";
+        // Replace <YOUR_PUBLIC_KEY_1> and <YOUR_PUBLIC_KEY_2> with the public keys that have been setup for your account
+        var key_1 = "<YOUR_PUBLIC_KEY_1>";
+        var key_2 = "<YOUR_PUBLIC_KEY_2>";
 
         switch (json_parsed_event.eventId) {
           case 'challenge-loaded':
@@ -74,16 +75,18 @@
   </head>
   <body>
     <div>
-      <h3>Key: 11111111-1111-1111-1111-111111111111</h3>
-      <iframe id="arkoseFrame1" src="https://iframe.arkoselabs.com/11111111-1111-1111-1111-111111111111/index.html"></iframe>
+      <h3>Key One</h3>
+      <!-- Replace <YOUR_PUBLIC_KEY_1> with the public key assigned to key_1 -->
+      <iframe id="arkoseFrame1" src="https://iframe.arkoselabs.com/<YOUR_PUBLIC_KEY_1>/index.html"></iframe>
       <p>&nbsp;</p>
       <div>
       <p><strong>Session Token:</strong><br /><span id="token">-</span></p>
       </div>
     </div>
     <div>
-      <h3>Key: 22222222-2222-2222-2222-222222222222</h3>
-      <iframe id="arkoseFrame2" src="https://iframe.arkoselabs.com/22222222-2222-2222-2222-222222222222/index.html"></iframe>
+      <h3>Key Two</h3>
+      <!-- Replace <YOUR_PUBLIC_KEY_2> with the public key assigned to key_2 -->
+      <iframe id="arkoseFrame2" src="https://iframe.arkoselabs.com/<YOUR_PUBLIC_KEY_2>/index.html"></iframe>
       <p>&nbsp;</p>
       <div>
       <p><strong>Session Token:</strong><br /><span id="token2">-</span></p>

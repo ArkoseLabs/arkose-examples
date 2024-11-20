@@ -3,7 +3,8 @@ import { httpRequest } from 'http-request';
 import { createResponse } from 'create-response';
 
 export async function responseProvider(request) {
-  const publicKey = '11111111-1111-1111-1111-111111111111'; // Arkose public key to use
+  // Replace <YOUR_PUBLIC_KEY> with the public key that has been setup for your account
+  const publicKey = '<YOUR_PUBLIC_KEY>';
   const filePath = '/template.html'; // The path of the HTML to inject arkose into
 
   // Setup: Fetch a stream containing HTML

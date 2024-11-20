@@ -6,7 +6,7 @@ This worker includes several variables that can be setup to customise the behavi
 
 | Variable              | Description                                                           | Default                                |
 | --------------------- | --------------------------------------------------------------------- | -------------------------------------- |
-| publicKey             | The Arkose public key to use in this worker                           | `11111111-1111-1111-1111-111111111111` |
+| publicKey             | The Arkose public key to use in this worker                           | N/A. The key must be setup in the main.js file by replacing <YOUR_PUBLIC_KEY> with the public key configured for your account.                                        |
 | filePath              | The path to the HTML to be injected                                   | `/path/to/file.html`                   |
 | arkoseMaxRetryCount   | The number of retries to perform when there is an error               | `2`                                    |
 | arkoseCookieName      | The name of the cookie that the Arkose token will be stored in        | `arkose-token`                         |
