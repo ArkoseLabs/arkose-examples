@@ -25,6 +25,10 @@ cd ..
 
 Note: This example application was built for JDK 19 and below, we recommend using that version for running this application.
 
+## Setup ARKOSE_PUBLIC_KEY
+
+Replace `<YOUR_PUBLIC_KEY>` with the public key set up for your account in the App.js file.
+
 ## Start the application
 
 Once setup as above you can use the following commands to run the application from the base path of the application directory.
@@ -58,7 +62,7 @@ cd ..
 
 # Configuration
 
-This example application allows you to set your Arkose Labs provided public key and custom host name (if applicable).
+This example application allows you to set custom host name (if applicable).
 
-These can be set in the [App.js file](App.js). 
+This can be set in the [App.js file](App.js). 
 

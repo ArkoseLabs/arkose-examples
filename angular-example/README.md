@@ -4,13 +4,17 @@ More details of how to implement the Arkose Labs API can be found at https://dev
 
 ## Run Locally
 
-Install dependencies
+#### Install dependencies
 
 ```bash
   npm install
 ```
 
-Start the server
+#### Setup Public Key
+
+Replace `<YOUR_PUBLIC_KEY>` with the public key set up for your account in both the environment.ts file and, if applicable, the environment.prod.ts file.
+
+#### Start the server
 
 ```bash
   npm run start

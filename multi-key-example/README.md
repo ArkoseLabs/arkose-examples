@@ -5,19 +5,23 @@ More details of how to implement the Arkose Labs API can be found at https://dev
 
 ## Run Locally
 
-Install dependencies
+#### Install dependencies
 
 ```bash
   npm install
 ```
 
-Start the server
+#### Setup Public Keys
+
+Replace `<YOUR_PUBLIC_KEY_1>` and `<YOUR_PUBLIC_KEY_2>` with the public keys set up for your account in both the index.html file and, if applicable, the iframe.html file.
+
+#### Start the server
 
 ```bash
   npm run start
 ```
 
-Start the server with multi iFrame example
+#### Start the server with multi iFrame example
 
 ```bash
   npm run start-iframe

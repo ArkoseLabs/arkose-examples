@@ -5,11 +5,11 @@ This is an example of a Cloudflare worker that can be setup as a cdn proxy. This
 For more details on how to use this worker please refer to our [developer docs](https://developer.arkoselabs.com/docs/arkose-on-cloudflare-reference-architecture).
 
 ## Configuration
-This worker includes several environment variables that can be setup to custmise the behaviour of the worker.
+This worker includes several environment variables that can be setup to customise the behaviour of the worker.
 
 | Variable                  | Description                                                     | Default                                |
 | ------------------- | --------------------------------------------------------------------- | -------------------------------------- |
-| publicKey           | The Arkose public key to use in this worker                           | `11111111-1111-1111-1111-111111111111` |
+| publicKey           | The Arkose public key to use in this worker                           |                                        |
 | privateKey          | The Arkose private key to use in this worker                          | ``                                     |
 | errorUrl            | A url to redirect error states to if required                         | `https://arkoselabs.com`               |
 | tokenMethod         | The method used for extracting the token, can be `header` or `cookie` | `header`                               |

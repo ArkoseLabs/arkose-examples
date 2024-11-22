@@ -9,7 +9,7 @@ This example replicates the Arkose Labs api.js file being injected and loaded in
 Note: the Arkose Labs api.js file can be injected and loaded before the closing body tag if required.
 
 ## Configuration
-In the example the Client-API file is loaded for the demo public key: `11111111-1111-1111-1111-111111111111`, to switch to another key the api.js script will need its url updated to point at the required key.
+The placeholder `<YOUR_PUBLIC_KEY>` in the example must be replaced with the public key setup for your account to ensure the api.js script works properly.
 
 In the javascript loaded at the end of the body tag the following variables can be modified to allow specific behaviours
 

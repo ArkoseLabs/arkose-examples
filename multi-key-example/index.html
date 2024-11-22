@@ -6,12 +6,12 @@
 </head>
 <body>
 	<div>
-		<p>Public Key: 11111111-1111-1111-1111-111111111111</p>
+		<p>Public Key One</p>
 		<button id="load1">Load JS</button>
 		<button id="ec1" disabled>Open EC</button>
 	</div>
 	<div>
-		<p>Public Key: 22222222-2222-2222-2222-222222222222</p>
+		<p>Public Key Two</p>
     <button id="load2">Load JS</button>
 		<button id="ec2" disabled>Open EC</button>
 	<div>
@@ -54,8 +54,9 @@
           }
         });
       }
-      document.getElementById("load1").onclick = () => { loadJS("11111111-1111-1111-1111-111111111111", "loadEc1") }
-      document.getElementById("load2").onclick = () => { loadJS("22222222-2222-2222-2222-222222222222", "loadEc2") }
+      // Replace <YOUR_PUBLIC_KEY_1> and <YOUR_PUBLIC_KEY_2> with the public keys that have been setup for your account
+      document.getElementById("load1").onclick = () => { loadJS("<YOUR_PUBLIC_KEY_1>", "loadEc1") }
+      document.getElementById("load2").onclick = () => { loadJS("<YOUR_PUBLIC_KEY_2>", "loadEc2") }
     </script>
 </body>
 

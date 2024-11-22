@@ -4,13 +4,17 @@ More details of how to implement the Arkose Labs API can be found at https://dev
 
 ## Run Locally
 
-Install dependencies
+#### Install dependencies
 
 ```bash
   npm install
 ```
 
-Start the server
+#### Setup REACT_APP_ARKOSE_PUBLIC_KEY
+
+Replace `<YOUR_PUBLIC_KEY>` with the public key set up for your account in the .env file.
+
+#### Start the server
 
 ```bash
   npm run start
