@@ -28,8 +28,6 @@ export class ArkoseScriptService {
     script.type = 'text/javascript';
     script.src = `https://client-api.arkoselabs.com/v2/${publicKey}/api.js`;
     script.setAttribute('data-callback', 'setupEnforcement');
-    script.async = true;
-    script.defer = true;
     if (nonce) {
       script.setAttribute('data-nonce', nonce);
     }

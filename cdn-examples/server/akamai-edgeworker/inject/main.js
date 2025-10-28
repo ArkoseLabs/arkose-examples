@@ -27,7 +27,6 @@ export async function responseProvider(request) {
     <script 
         src="https://client-api.arkoselabs.com/v2/${publicKey}/api.js"
         data-callback="setupEnforcement"
-        async defer
     ></script>
     <script>
         var arkoseReady = false;        // Flag for checking if CAPI has called onReady

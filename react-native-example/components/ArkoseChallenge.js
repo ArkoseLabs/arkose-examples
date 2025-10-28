@@ -5,8 +5,6 @@ export const ArkoseChallenge = ({ arkosePublicKey, arkoseHostname }) => `
     <script
       data-callback="setupEnforcement"
       src="${arkoseHostname}/v2/${arkosePublicKey}/api.js"
-      async
-      defer
     ></script>
     <script type="text/javascript">
       // Setup the enforcement API

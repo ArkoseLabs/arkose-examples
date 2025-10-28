@@ -294,8 +294,6 @@ export default {
                 script.type = 'text/javascript';
                 script.src = arkoseScriptSrc;
                 script.setAttribute('data-callback', 'setupEnforcement');
-                script.async = true;
-                script.defer = true;
                 script.id = 'arkose-script';
                 document.getElementsByTagName('head')[0].appendChild(script);
             }

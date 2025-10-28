@@ -23,8 +23,6 @@ export default class Arkose extends React.Component {
     script.type = 'text/javascript';
     script.src = `https://client-api.arkoselabs.com/v2/${this.props.publicKey}/api.js`;
     script.setAttribute('data-callback', 'setupEnforcement');
-    script.async = true;
-    script.defer = true;
     if (this.props.nonce) {
       script.setAttribute('data-nonce', this.props.nonce);
     }
