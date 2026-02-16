@@ -23,6 +23,9 @@
     "eslint-plugin-react": "^7.31.10",
     "react-scripts": "^5.0.1"
   },
+  "overrides": {
+    "form-data": "3.0.4"
+  },
   "browserslist": {
     "production": [
       ">0.2%",
