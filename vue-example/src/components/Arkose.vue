@@ -58,10 +58,10 @@ onMounted(() => {
 
   const script = document.createElement('script');
   script.id = scriptId;
-  script.type = 'text/javascript';
   script.src = `https://client-api.arkoselabs.com/v2/${props.publicKey}/api.js`;
   script.setAttribute('data-callback', 'setupEnforcement');
   script.async = true;
+  script.onerror = () => emit('error', { error: 'Script load failed' });
   if (props.nonce) {
     script.setAttribute('data-nonce', props.nonce);
   }
@@ -72,5 +72,7 @@ onBeforeUnmount(() => {
   if (window.setupEnforcement === setupEnforcement) {
     delete window.setupEnforcement;
   }
+  const el = document.getElementById(scriptId);
+  if (el) el.remove();
 });
 </script>

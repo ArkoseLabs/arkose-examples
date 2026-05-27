@@ -14,7 +14,6 @@ export class ArkoseScriptService {
 
     const script = this.document.createElement('script');
     script.id = scriptId;
-    script.type = 'text/javascript';
     script.src = `https://client-api.arkoselabs.com/v2/${publicKey}/api.js`;
     script.setAttribute('data-callback', 'setupEnforcement');
     script.async = true;

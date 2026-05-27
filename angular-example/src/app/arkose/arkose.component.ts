@@ -28,7 +28,6 @@ export class ArkoseComponent implements OnInit, OnDestroy {
 
   private enforcement: ArkoseEnforcement | null = null;
   private retryCount = 0;
-  private resetting = false;
   private zone = inject(NgZone);
   private scriptService = inject(ArkoseScriptService);
 
@@ -38,7 +37,8 @@ export class ArkoseComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     window.setupEnforcement = this.setupEnforcement;
-    this.scriptService.loadScript(this.publicKey(), this.nonce());
+    const script = this.scriptService.loadScript(this.publicKey(), this.nonce());
+    script.onerror = () => this.zone.run(() => this.error.emit({ error: 'Script load failed' } as ArkoseErrorResponse));
   }
 
   ngOnDestroy(): void {
@@ -61,10 +61,7 @@ export class ArkoseComponent implements OnInit, OnDestroy {
     this.enforcement.setConfig({
       selector: this.selectorId() ? `#${this.selectorId()}` : undefined,
       mode: this.mode(),
-      onReady: () => this.zone.run(() => {
-        this.resetting = false;
-        this.ready.emit();
-      }),
+      onReady: () => this.zone.run(() => this.ready.emit()),
       onShown: () => this.zone.run(() => this.shown.emit()),
       onShow: () => this.zone.run(() => this.show.emit()),
       onSuppress: () => this.zone.run(() => this.suppress.emit()),
@@ -76,7 +73,6 @@ export class ArkoseComponent implements OnInit, OnDestroy {
       onError: async (response: ArkoseErrorResponse) => {
         const healthy = await this.checkHealth();
         if (healthy && this.retryCount < this.maxRetries()) {
-          this.resetting = true;
           this.retryCount++;
           enforcement.reset();
           return;

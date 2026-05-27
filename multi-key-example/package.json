@@ -4,6 +4,6 @@
   "description": "Arkose Labs multi-key integration examples",
   "scripts": {
     "start": "npx serve -l 3000 --single",
-    "start-iframe": "npx serve -l 3000 --single"
+    "start-iframe": "npx serve -l 3000 --single iframe.html"
   }
 }

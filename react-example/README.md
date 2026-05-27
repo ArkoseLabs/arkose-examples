@@ -44,4 +44,4 @@ Once Arkose Verification/Challenge is completed in login page, it will navigate 
   http://localhost:5173/dashboard
 ```
 
-We have integrated Arkose security enforcement as a shared component. There is a loadScript function which injects the requisite script. When the script is injected, the passing public key which is stored on an environment file is also passed along. Once the script is loaded, the workflow binds the callback function to a Window Object. The various usages of Callback Functions are available for perusal in [Arkose Development Documentation](https://developer.arkoselabs.com)
+The Arkose integration uses a shared component that injects the Arkose Client API script. The public key is stored in an environment file and passed to the script URL. A callback function is bound to the Window Object before the script loads to avoid race conditions. The various usages of Callback Functions are available for perusal in [Arkose Development Documentation](https://developer.arkoselabs.com)

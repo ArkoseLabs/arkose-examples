@@ -82,6 +82,7 @@
         async function checkArkoseStatus(callback) {
             try {
                 const res = await fetch('https://status.arkoselabs.com/api/v2/status.json');
+                if (!res.ok) { callback(false); return; }
                 const data = await res.json();
                 const status = data.status.indicator;
                 callback(!(status === 'critical'));

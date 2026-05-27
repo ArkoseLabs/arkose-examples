@@ -44,6 +44,9 @@ export default function App(): React.JSX.Element {
       case 'onFailed':
         // Handle error: message.response contains error details
         break;
+      default:
+        console.log(`Arkose callback: ${message.callback}`);
+        break;
     }
   }, []);
 

@@ -82,32 +82,36 @@
         * Sends a request to an endpoint which triggers the Akamai EdgeWorker to make a proxy call to Arkose Verify.
         */
         async function proxyVerify(token) {
-            const tokenMethod = document.querySelector('input[name="token-method"]:checked').value;
-            const headers = { 'Content-type': 'application/json; charset=utf-8' };
+            try {
+                const tokenMethod = document.querySelector('input[name="token-method"]:checked').value;
+                const headers = { 'Content-type': 'application/json; charset=utf-8' };
 
-            if (tokenMethod === "header") {
-                headers['arkose-token'] = token;
-            }
+                if (tokenMethod === "header") {
+                    headers['arkose-token'] = token;
+                }
 
-            if (tokenMethod === "cookie") {
-                document.cookie = `arkose-token=${token};expires=${new Date(Date.now() + 10000).toUTCString()}; path=/;`;
-            }
+                if (tokenMethod === "cookie") {
+                    document.cookie = `arkose-token=${token};expires=${new Date(Date.now() + 10000).toUTCString()}; path=/;`;
+                }
 
-            const body = JSON.stringify({
-                username: document.getElementById("username").value,
-                password: document.getElementById("password").value
-            });
+                const body = JSON.stringify({
+                    username: document.getElementById("username").value,
+                    password: document.getElementById("password").value
+                });
 
-            // Route to run the Proxy EdgeWorker to call Arkose Verify
-            const response = await fetch('/proxy-verify', {
-                method: 'POST',
-                headers,
-                body,
-            });
+                // Route to run the Proxy EdgeWorker to call Arkose Verify
+                const response = await fetch('/proxy-verify', {
+                    method: 'POST',
+                    headers,
+                    body,
+                });
 
-            if (response.ok) {
-                const data = await response.text();
-                console.log('Successfully Verified', data);
+                if (response.ok) {
+                    const data = await response.text();
+                    console.log('Successfully Verified', data);
+                }
+            } catch (error) {
+                console.error('Proxy verify failed', error);
             }
         }
 
