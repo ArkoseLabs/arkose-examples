@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8" />
@@ -19,56 +20,41 @@
     <script>
       window.addEventListener('message', function(event) {
         if (!event.data || typeof event.data === 'object') return;
-        var json_parsed_event = JSON.parse(event.data);
+
+        if (event.origin !== 'https://iframe.arkoselabs.com') return;
+
+        let json_parsed_event;
+        try {
+            json_parsed_event = JSON.parse(event.data);
+        } catch {
+            return;
+        }
 
         // Replace <YOUR_PUBLIC_KEY_1> and <YOUR_PUBLIC_KEY_2> with the public keys that have been setup for your account
-        var key_1 = "<YOUR_PUBLIC_KEY_1>";
-        var key_2 = "<YOUR_PUBLIC_KEY_2>";
+        const key_1 = "<YOUR_PUBLIC_KEY_1>";
+        const key_2 = "<YOUR_PUBLIC_KEY_2>";
+
+        const keyMap = {
+            [key_1]: { frame: 'arkoseFrame1', token: 'token' },
+            [key_2]: { frame: 'arkoseFrame2', token: 'token2' },
+        };
+
+        const entry = keyMap[json_parsed_event.publicKey];
+        if (!entry) return;
 
         switch (json_parsed_event.eventId) {
-          case 'challenge-loaded':
-           if (json_parsed_event.publicKey === key_1) {
-                document.getElementById('arkoseFrame1').style.height =
-                json_parsed_event.payload.frameHeight;
-                document.getElementById('arkoseFrame1').style.width =
-                json_parsed_event.payload.frameWidth;
-            }
-            if (json_parsed_event.publicKey === key_2) {
-                document.getElementById('arkoseFrame2').style.height =
-                json_parsed_event.payload.frameHeight;
-                document.getElementById('arkoseFrame2').style.width =
-                json_parsed_event.payload.frameWidth;
-            }
-            break;
-          case 'challenge-suppressed':
-            break;
-          case 'challenge-complete':
-            if (json_parsed_event.publicKey === key_1) {
-                document.getElementById('token').innerHTML =
-                    json_parsed_event.payload.sessionToken;
-            }
-            if (json_parsed_event.publicKey === key_2) {
-                document.getElementById('token2').innerHTML =
-                    json_parsed_event.payload.sessionToken;            }
-            break;
-          case 'challenge-shown':
-            break;
-          case 'challenge-error':
-            break;
-          case 'challenge-iframeSize':
-            if (json_parsed_event.publicKey === key_1) {
-                document.getElementById('arkoseFrame1').style.height =
-                    json_parsed_event.payload.frameHeight;
-                document.getElementById('arkoseFrame1').style.width =
-                    json_parsed_event.payload.frameWidth;
-            }
-            if (json_parsed_event.publicKey === key_2) {
-                document.getElementById('arkoseFrame2').style.height =
-                    json_parsed_event.payload.frameHeight;
-                document.getElementById('arkoseFrame2').style.width =
-                    json_parsed_event.payload.frameWidth;
-            }
-            break;
+            case 'challenge-loaded':
+            case 'challenge-iframeSize':
+                document.getElementById(entry.frame).style.height = json_parsed_event.payload.frameHeight;
+                document.getElementById(entry.frame).style.width = json_parsed_event.payload.frameWidth;
+                break;
+            case 'challenge-complete':
+                document.getElementById(entry.token).textContent = json_parsed_event.payload.sessionToken;
+                break;
+            case 'challenge-suppressed':
+            case 'challenge-shown':
+            case 'challenge-error':
+                break;
         }
       });
     </script>
@@ -91,6 +77,6 @@
       <div>
       <p><strong>Session Token:</strong><br /><span id="token2">-</span></p>
       </div>
-    <div>
+    </div>
   </body>
 </html>

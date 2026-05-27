@@ -6,9 +6,10 @@
     <title>CDN Integration - Form Takeover Example</title>
     <!-- Javascript to inject in the page header -->
     <!-- Replace <YOUR_PUBLIC_KEY> with the public key that has been setup for your account -->
-    <script 
+    <script
         src="https://client-api.arkoselabs.com/v2/<YOUR_PUBLIC_KEY>/api.js"
         data-callback="setupEnforcement"
+        async
     ></script>
     <!---->
     <style>
@@ -18,11 +19,13 @@
   </head>
   <body>
     <form action="" method="post" id="submitForm">
-        <h3>Login</h3>
+        <h2>Login</h2>
         <div class="formField">
+            <label for="username">Username</label>
             <input type="text" id="username" placeholder="Username" />
         </div>
-        <div>
+        <div class="formField">
+            <label for="password">Password</label>
             <input type="password" id="password" placeholder="Password" />
         </div>
         <div class="formField">
@@ -31,21 +34,21 @@
     </form>
     <!-- Javascript to inject before the closing body tag -->
     <script>
-        var arkoseReady = false; // Flag for checking if CAPI has called onReady
-        var arkoseComplete = false; // Flag to signify the challenge being completed
-        var arkoseResetting = false; // Flag to signify when the challenge is being reset
-        var arkose; // Arkose Enforcement Object
-        var arkoseRetry = 0; // Counter for Retries
+        let arkoseReady = false; // Flag for checking if CAPI has called onReady
+        let arkoseComplete = false; // Flag to signify the challenge being completed
+        let arkoseResetting = false; // Flag to signify when the challenge is being reset
+        let arkose; // Arkose Enforcement Object
+        let arkoseRetry = 0; // Counter for Retries
 
         // The following variables can be changed
-        var arkoseMaxRetryCount = 2; // The number of retries to perform when there is an error 
-        var arkoseCookieName = 'arkoseToken'; // The name of the cookie that the Arkose token will be stored in
-        var arkoseErrorCookieName = 'arkoseError'; // The name of the cookie that an Arkose error will be stored in 
-        var arkoseCookieLife = 5 * 60 * 1000;  // The length of time that the cookie should be active for, 5 mins is the default
-        var formSelector = '#submitForm'; // The querySelector string used for selecting the required form to protect
+        const arkoseMaxRetryCount = 2; // The number of retries to perform when there is an error
+        const arkoseCookieName = 'arkoseToken'; // The name of the cookie that the Arkose token will be stored in
+        const arkoseErrorCookieName = 'arkoseError'; // The name of the cookie that an Arkose error will be stored in
+        const arkoseCookieLife = 5 * 60 * 1000;  // The length of time that the cookie should be active for, 5 mins is the default
+        const formSelector = '#submitForm'; // The querySelector string used for selecting the required form to protect
 
-        var submitForm = document.querySelector(formSelector);
-        var submitButton = null;
+        const submitForm = document.querySelector(formSelector);
+        let submitButton = null;
         setupForm();
 
         /**
@@ -58,7 +61,7 @@
                 if (!arkoseReady) {
                     submitButton.setAttribute('disabled', true);
                 }
-                submitForm.addEventListener('submit', function (event) {
+                submitForm.addEventListener('submit', (event) => {
                     if (!arkoseReady) {
                         event.preventDefault();
                         return;
@@ -76,22 +79,12 @@
         * Checks the current status of the Arkose Labs platform and invokes a callback with the result
         * @param  {function} callback The function to call once the status check has been performed
         */
-        function checkArkoseStatus(callback) {
+        async function checkArkoseStatus(callback) {
             try {
-                var xhr = new XMLHttpRequest();
-                xhr.open('GET', 'https://status.arkoselabs.com/api/v2/status.json', false);
-                xhr.onreadystatechange = function() {
-                    if (xhr.readyState == XMLHttpRequest.DONE) {
-                        if (this.status == 200) {
-                            var res = JSON.parse(xhr.responseText);
-                            var status = res.status.indicator;
-                            callback(!(status === 'critical'));
-                            return;
-                        }
-                        callback(false);
-                    }
-                };
-                xhr.send(null);
+                const res = await fetch('https://status.arkoselabs.com/api/v2/status.json');
+                const data = await res.json();
+                const status = data.status.indicator;
+                callback(!(status === 'critical'));
             } catch (error) {
                 callback(false);
             }
@@ -103,10 +96,10 @@
         */
         function handleError(error) {
             arkoseComplete = true;
-            document.cookie = arkoseCookieName + '=;expires=' + new Date(Date.now() + arkoseCookieLife).toUTCString() + '; path=/;';
-            document.cookie = arkoseErrorCookieName + '=' + error + ';expires=' + new Date(Date.now() + arkoseCookieLife).toUTCString() + '; path=/;';                               
-        }  
-        
+            document.cookie = `${arkoseCookieName}=;expires=${new Date(Date.now() + arkoseCookieLife).toUTCString()}; path=/;`;
+            document.cookie = `${arkoseErrorCookieName}=${error};expires=${new Date(Date.now() + arkoseCookieLife).toUTCString()}; path=/;`;
+        }
+
          /**
         * The callback thats called after the Arkose Labs script has been loaded
         * @param  {object} myEnforcement The Arkose Labs enforcement object
@@ -114,7 +107,7 @@
         function setupEnforcement(myEnforcement) {
             arkose = myEnforcement;
             arkose.setConfig({
-                onReady: function() {
+                onReady: () => {
                     arkoseReady = true;
                     if (submitButton) {
                         submitButton.removeAttribute('disabled');
@@ -123,20 +116,20 @@
                         arkoseResetting = false;
                         arkose.run();
                     }
-                    document.cookie = arkoseCookieName + '=' + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-                    document.cookie = arkoseErrorCookieName + '=' + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                    document.cookie = `${arkoseCookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+                    document.cookie = `${arkoseErrorCookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
                 },
-                onCompleted: function(response) {
+                onCompleted: (response) => {
                     arkoseComplete = true;
                     if (response.token){
-                        document.cookie = arkoseCookieName + '=' + response.token + ';expires=' + new Date(Date.now() + arkoseCookieLife).toUTCString() + '; path=/;';
+                        document.cookie = `${arkoseCookieName}=${response.token};expires=${new Date(Date.now() + arkoseCookieLife).toUTCString()}; path=/;`;
                     } else {
                         handleError('TOKEN_MISSING');
                     }
                     submitForm.submit();
                 },
-                onError: function(response) {
-                    checkArkoseStatus(function (isHealthy) {    
+                onError: (response) => {
+                    checkArkoseStatus((isHealthy) => {
                         if (isHealthy && arkoseRetry < arkoseMaxRetryCount) {
                             arkoseReady = false;
                             arkoseResetting = true;

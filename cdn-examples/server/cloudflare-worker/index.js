@@ -156,7 +156,7 @@ const getArkoseToken = (request, tokenMethod, tokenIdentifier) => {
  * @return {Object} The response to handle the error
  */
 const handleFailure = (errorUrl) => {
-  return Response.redirect(errorUrl, '301'); // Set this to your error handling URL
+  return Response.redirect(errorUrl, 302); // Set this to your error handling URL
 };
 
 

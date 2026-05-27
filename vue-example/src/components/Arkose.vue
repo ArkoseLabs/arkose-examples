@@ -1,114 +1,76 @@
 <template>
   <div
-    v-if="mode === 'inline'"
-    :id="selector?.slice(1)"
+    v-if="mode === 'inline' && selector"
+    :id="selector.replace(/^#/, '')"
   />
 </template>
 
-<script>
-export default {
-  // eslint-disable-next-line vue/multi-word-component-names
-  name: 'Arkose',
-  props: {
-    publicKey: {
-      type: String,
-      default: ''
-    },
-    mode: {
-      type: String,
-      default: ''
-    },
-    selector: {
-      type: String,
-      default: null // Any valid DOM selector is allowed here
-    },
-    nonce: {
-      type: String,
-      default: ''
-    }
-  },
-  data () {
-    return {
-      scriptId: ''
-    };
-  },
-  methods: {
-    removeScript () {
-      const currentScript = document.getElementById(this.scriptId);
-      if (currentScript) {
-        currentScript.remove();
-      }
-    },
-    // Append the JS tag to the Document Body.
-    loadScript (publicKey, nonce) {
-      this.removeScript();
-      const script = document.createElement('script');
-      script.id = this.scriptId;
-      script.type = 'text/javascript';
-      script.src = `https://client-api.arkoselabs.com/v2/${publicKey}/api.js`;
-      script.setAttribute('data-callback', 'setupEnforcement');
-      if (nonce) {
-        script.setAttribute('data-nonce', nonce);
-      }
-      document.body.appendChild(script);
-      return script;
-    },
-    setupEnforcement (myEnforcement) {
-      window.myEnforcement = myEnforcement;
-      window.myEnforcement.setConfig({
-        selector: this.selector,
-        mode: this.mode,
-        onReady: () => {
-          this.$emit('onReady');
-        },
-        onShown: () => {
-          this.$emit('onShown');
-        },
-        onShow: () => {
-          this.$emit('onShow');
-        },
-        onSuppress: () => {
-          this.$emit('onSuppress');
-        },
-        onCompleted: (response) => {
-          this.$emit('onCompleted', response.token);
-        },
-        onReset: () => {
-          this.$emit('onReset');
-        },
-        onHide: () => {
-          this.$emit('onHide');
-        },
-        onError: (response) => {
-          this.$emit('onError', response);
-        },
-        onFailed: (response) => {
-          this.$emit('onFailed', response);
-        }
-      });
-    }
-  },
-  mounted () {
-    this.scriptId = `arkose-script-${this.publicKey}`;
-    const scriptElement = this.loadScript(this.publicKey, this.nonce);
-    // This will inject required html and css after the Arkose script is properly loaded
-    scriptElement.onload = () => {
-      console.log('Arkose API Script loaded');
-      window.setupEnforcement = this.setupEnforcement.bind(this);
-    };
-    // If there is an error loading the Arkose script this callback will be called
-    scriptElement.onerror = () => {
-      console.log('Could not load the Arkose API Script!');
-    };
-  },
-  destroyed () {
-    if (window.myEnforcement) {
-      delete window.myEnforcement;
-    }
-    if (window.setupEnforcement) {
-      delete window.setupEnforcement;
-    }
-    this.removeScript();
-  }
+<script setup>
+import { onMounted, onBeforeUnmount } from 'vue';
+
+const props = defineProps({
+  publicKey: { type: String, required: true },
+  mode: { type: String, default: '' },
+  selector: { type: String, default: null },
+  nonce: { type: String, default: '' },
+});
+
+const emit = defineEmits([
+  'ready', 'shown', 'show', 'suppress', 'completed',
+  'reset', 'hide', 'error', 'failed',
+]);
+
+let enforcement = null;
+const scriptId = `arkose-script-${props.publicKey}`;
+
+const run = () => enforcement?.run();
+
+defineExpose({ run });
+
+const setupEnforcement = (myEnforcement) => {
+  enforcement = myEnforcement;
+  enforcement.setConfig({
+    selector: props.selector,
+    mode: props.mode,
+    onReady: () => emit('ready'),
+    onShown: () => emit('shown'),
+    onShow: () => emit('show'),
+    onSuppress: () => emit('suppress'),
+    onCompleted: (response) => emit('completed', response.token),
+    onReset: () => emit('reset'),
+    onHide: () => emit('hide'),
+    onError: (response) => emit('error', response),
+    onFailed: (response) => emit('failed', response),
+  });
 };
+
+onMounted(() => {
+  window.setupEnforcement = setupEnforcement;
+
+  if (enforcement) {
+    setupEnforcement(enforcement);
+    return;
+  }
+
+  if (document.getElementById(scriptId)) {
+    return;
+  }
+
+  const script = document.createElement('script');
+  script.id = scriptId;
+  script.type = 'text/javascript';
+  script.src = `https://client-api.arkoselabs.com/v2/${props.publicKey}/api.js`;
+  script.setAttribute('data-callback', 'setupEnforcement');
+  script.async = true;
+  if (props.nonce) {
+    script.setAttribute('data-nonce', props.nonce);
+  }
+  document.body.appendChild(script);
+});
+
+onBeforeUnmount(() => {
+  if (window.setupEnforcement === setupEnforcement) {
+    delete window.setupEnforcement;
+  }
+});
 </script>

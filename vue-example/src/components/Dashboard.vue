@@ -1,9 +1,9 @@
 <template>
-  <h2>Welcome to the dashboard</h2>
+  <div>
+    <h2>Dashboard</h2>
+    <p>Welcome! You have been verified.</p>
+    <nav>
+      <router-link to="/">Back to Login</router-link>
+    </nav>
+  </div>
 </template>
-
-<script>
-export default {
-  name: 'DashboardComponent'
-};
-</script>

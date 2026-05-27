@@ -3,6 +3,7 @@
 <head>
 	<title>Multi Keys Example</title>
 	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
 <body>
 	<div>
@@ -14,7 +15,7 @@
 		<p>Public Key Two</p>
     <button id="load2">Load JS</button>
 		<button id="ec2" disabled>Open EC</button>
-	<div>
+	</div>
     <script>
       const loadJS = (key, callback) => {
         const currentScript = document.querySelector(`script[src*="${key}/api.js"]`)
@@ -37,7 +38,11 @@
           },
           onCompleted: (response) => {
             console.log(response.token);
-          }
+          },
+          onError: (response) => {
+            console.error('Arkose error (key 1):', response);
+            document.getElementById("ec1").disabled = false;
+          },
         });
       }
 
@@ -49,7 +54,11 @@
           },
           onCompleted: (response) => {
             console.log(response.token);
-          }
+          },
+          onError: (response) => {
+            console.error('Arkose error (key 2):', response);
+            document.getElementById("ec2").disabled = false;
+          },
         });
       }
       // Replace <YOUR_PUBLIC_KEY_1> and <YOUR_PUBLIC_KEY_2> with the public keys that have been setup for your account

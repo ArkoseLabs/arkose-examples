@@ -6,9 +6,10 @@
     <title>Akamai CDN Integration - Verify Proxy Example</title>
     <!-- Javascript to inject in the page header -->
     <!-- Replace <YOUR_PUBLIC_KEY> with the public key that has been setup for your account -->
-    <script 
+    <script
         src="https://client-api.arkoselabs.com/v2/<YOUR_PUBLIC_KEY>/api.js"
         data-callback="setupEnforcement"
+        async
     ></script>
     <!---->
     <style>
@@ -18,36 +19,40 @@
   </head>
   <body>
     <form action="" method="post" id="submitForm">
-        <h3>Login</h3>
+        <h2>Login</h2>
         <div class="formField">
+            <label for="username">Username</label>
             <input type="text" id="username" placeholder="Username" />
         </div>
-        <div>
+        <div class="formField">
+            <label for="password">Password</label>
             <input type="password" id="password" placeholder="Password" />
         </div>
         <div class="formField">
             <input type="submit" value="Submit" id="submitButton" />
         </div>
-        <p>Select Token Method</p>
+        <fieldset>
+          <legend>Select Token Method</legend>
           <input type="radio" id="header-token-method" name="token-method" value="header">
           <label for="header-token-method">Header</label><br>
           <input type="radio" id="cookie-token-method" name="token-method" value="cookie">
           <label for="cookie-token-method">Cookie</label><br>
+        </fieldset>
     </form>
     <!-- Javascript to inject before the closing body tag -->
     <script>
-        var arkoseReady = false; // Flag for checking if CAPI has called onReady
-        var arkoseComplete = false; // Flag to signify the challenge being completed
-        var arkoseResetting = false; // Flag to signify when the challenge is being reset
-        var arkose; // Arkose Enforcement Object
+        let arkoseReady = false; // Flag for checking if CAPI has called onReady
+        let arkoseComplete = false; // Flag to signify the challenge being completed
+        let arkoseResetting = false; // Flag to signify when the challenge is being reset
+        let arkose; // Arkose Enforcement Object
 
         // The following variables can be changed
-        var arkoseCookieName = 'arkoseToken'; // The name of the cookie that the Arkose token will be stored in
-        var arkoseErrorCookieName = 'arkoseError'; // The name of the cookie that an Arkose error will be stored in 
-        var arkoseCookieLife = 5 * 60 * 1000;  // The length of time that the cookie should be active for, 5 mins is the default
-        var buttonSelector = '#submitButton'; // The querySelector string used for selecting the required button to protect
+        const arkoseCookieName = 'arkoseToken'; // The name of the cookie that the Arkose token will be stored in
+        const arkoseErrorCookieName = 'arkoseError'; // The name of the cookie that an Arkose error will be stored in
+        const arkoseCookieLife = 5 * 60 * 1000;  // The length of time that the cookie should be active for, 5 mins is the default
+        const buttonSelector = '#submitButton'; // The querySelector string used for selecting the required button to protect
 
-        var button = document.querySelector(buttonSelector);
+        const button = document.querySelector(buttonSelector);
         setupButton();
 
         /**
@@ -59,7 +64,7 @@
                 if (!arkoseReady) {
                     button.setAttribute('disabled', true);
                 }
-                button.addEventListener('click', function (event) {
+                button.addEventListener('click', (event) => {
                     if (!arkoseReady) {
                         event.preventDefault();
                         return;
@@ -76,36 +81,33 @@
         /**
         * Sends a request to an endpoint which triggers the Akamai EdgeWorker to make a proxy call to Arkose Verify.
         */
-        function proxyVerify(token) {
-            var tokenMethod = document.querySelector('input[name="token-method"]:checked').value;
-            var request = new XMLHttpRequest();
-
-            // Route to run the Proxy EdgeWorker to call Arkose Verify
-            request.open("POST", "/proxy-verify");
-
-            request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+        async function proxyVerify(token) {
+            const tokenMethod = document.querySelector('input[name="token-method"]:checked').value;
+            const headers = { 'Content-type': 'application/json; charset=utf-8' };
 
             if (tokenMethod === "header") {
-                request.setRequestHeader('arkose-token', token);
+                headers['arkose-token'] = token;
             }
 
             if (tokenMethod === "cookie") {
-                document.cookie = "arkose-token" + '=' + token + ';expires=' + new Date(Date.now() + 10000).toUTCString() + '; path=/;';
+                document.cookie = `arkose-token=${token};expires=${new Date(Date.now() + 10000).toUTCString()}; path=/;`;
             }
 
-            var body = JSON.stringify({
+            const body = JSON.stringify({
                 username: document.getElementById("username").value,
                 password: document.getElementById("password").value
             });
 
-            // Sending the request
-            request.send(body);
+            // Route to run the Proxy EdgeWorker to call Arkose Verify
+            const response = await fetch('/proxy-verify', {
+                method: 'POST',
+                headers,
+                body,
+            });
 
-            request.onload = function () {
-                if (request.readyState == 4 && request.status == 200) {
-                    const data = request.response;
-                    console.log('Successfully Verified', data);
-                }
+            if (response.ok) {
+                const data = await response.text();
+                console.log('Successfully Verified', data);
             }
         }
 
@@ -115,10 +117,10 @@
         */
         function handleError(error) {
             arkoseComplete = true;
-            document.cookie = arkoseCookieName + '=;expires=' + new Date(Date.now() + arkoseCookieLife).toUTCString() + '; path=/;';
-            document.cookie = arkoseErrorCookieName + '=' + error + ';expires=' + new Date(Date.now() + arkoseCookieLife).toUTCString() + '; path=/;';                               
-        }  
-        
+            document.cookie = `${arkoseCookieName}=;expires=${new Date(Date.now() + arkoseCookieLife).toUTCString()}; path=/;`;
+            document.cookie = `${arkoseErrorCookieName}=${error};expires=${new Date(Date.now() + arkoseCookieLife).toUTCString()}; path=/;`;
+        }
+
         /**
         * The callback thats called after the Arkose Labs script has been loaded
         * @param  {object} myEnforcement The Arkose Labs enforcement object
@@ -126,7 +128,7 @@
         function setupEnforcement(myEnforcement) {
             arkose = myEnforcement;
             arkose.setConfig({
-                onReady: function() {
+                onReady: () => {
                     arkoseReady = true;
                     if (button) {
                         button.removeAttribute('disabled');
@@ -135,10 +137,10 @@
                         arkoseResetting = false;
                         arkose.run();
                     }
-                    document.cookie = arkoseCookieName + '=' + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-                    document.cookie = arkoseErrorCookieName + '=' + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                    document.cookie = `${arkoseCookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+                    document.cookie = `${arkoseErrorCookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
                 },
-                onCompleted: function(response) {
+                onCompleted: (response) => {
                     arkoseComplete = true;
                     if (response.token){
                         proxyVerify(response.token);
@@ -146,7 +148,7 @@
                         handleError('TOKEN_MISSING');
                     }
                 },
-                onError: function(response) {
+                onError: (response) => {
                     handleError(response.error ? response.error.error : 'error');
                     button.removeAttribute('disabled');
                     button.click();

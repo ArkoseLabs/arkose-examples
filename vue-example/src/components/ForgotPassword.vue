@@ -3,57 +3,38 @@
     <h2>Forgot Password</h2>
     <Arkose
       :public-key="publicKey"
-      mode="inline"
       selector="#arkose-ec"
-      @onCompleted="onCompleted($event)"
-      @onError="onError($event)"
+      mode="inline"
+      @completed="onCompleted"
+      @error="onError"
     />
-    <input
-      type="text"
-      id="email"
-      name="email"
-      placeholder="Email"
-    >
-    <input
-      type="submit"
-      @click="onSubmit()"
-      value="Submit"
-      :disabled="!arkoseToken"
-    >
+    <input type="text" id="email" name="email" placeholder="Email" />
+    <button @click="onSubmit" :disabled="!arkoseToken">Reset</button>
     <nav>
-      <router-link to="/">
-        Login
-      </router-link>
+      <router-link to="/">Login</router-link>
     </nav>
   </div>
 </template>
 
-<script>
-import router from '../router.js';
+<script setup>
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 import Arkose from './Arkose.vue';
 
-export default {
-  name: 'ForgotPassword',
-  components: {
-    Arkose
-  },
-  data () {
-    return {
-      publicKey: process.env.VUE_APP_ARKOSE_PUBLIC_KEY,
-      arkoseToken: null
-    };
-  },
-  methods: {
-    onCompleted (token) {
-      this.arkoseToken = token;
-    },
-    onError (errorMessage) {
-      alert(errorMessage);
-    },
-    onSubmit () {
-      if (!this.arkoseToken) return;
-      router.replace({ path: '/' });
-    }
-  }
+const router = useRouter();
+const publicKey = import.meta.env.VITE_ARKOSE_PUBLIC_KEY;
+const arkoseToken = ref(null);
+
+const onCompleted = (token) => {
+  arkoseToken.value = token;
+};
+
+const onError = (errorMessage) => {
+  alert(errorMessage);
+};
+
+const onSubmit = () => {
+  if (!arkoseToken.value) return;
+  router.replace({ path: '/' });
 };
 </script>

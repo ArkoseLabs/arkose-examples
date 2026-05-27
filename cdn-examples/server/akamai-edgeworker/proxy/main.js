@@ -97,9 +97,11 @@ const verifyArkoseToken = async (
   let verified = false;
   let arkoseStatus = true;
   try {
-    const response = await httpRequest(
-      `/api/v4/verify?private_key=${privateKey}&session_token=${token}`
-    );
+    const response = await httpRequest('/api/v4/verify/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ private_key: privateKey, session_token: token }),
+    });
 
     const data = await response.json();
 

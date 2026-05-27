@@ -1,39 +1,20 @@
 {
-  "name": "arkose-vue2-example",
-  "version": "1.0.0",
+  "name": "arkose-vue-example",
+  "version": "2.0.0",
   "license": "MIT",
+  "type": "module",
   "scripts": {
-    "start": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "@vue/cli-plugin-babel": "^5.0.8",
-    "vue": "^2.6.14",
-    "vue-router": "^3.0.1"
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.1"
   },
   "devDependencies": {
-    "@vue/cli-plugin-eslint": "^5.0.8",
-    "@vue/cli-service": "^5.0.8",
-    "eslint": "^8.28.0",
-    "eslint-config-standard": "^17.0.0",
-    "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-n": "^15.5.1",
-    "eslint-plugin-promise": "^6.1.1",
-    "eslint-plugin-vue": "^9.8.0",
-    "vue-template-compiler": "^2.6.14"
+    "@vitejs/plugin-vue": "^5.2.4",
+    "vite": "^6.3.5"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "description": "Arkose Vue2 example"
+  "description": "Arkose Vue 3 example"
 }
