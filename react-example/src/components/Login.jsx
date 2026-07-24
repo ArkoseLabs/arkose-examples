@@ -21,6 +21,8 @@ export default function Login() {
     navigate('/dashboard');
   };
 
+  const onError = (message) => { alert(message); };
+
   return (
     <>
       <h2>Login</h2>
@@ -32,6 +34,7 @@ export default function Login() {
       <Arkose
         publicKey={publicKey}
         onCompleted={onCompleted}
+        onError={onError}
         ref={arkoseRef}
       />
     </>

@@ -8,11 +8,6 @@ export function buildArkoseHtml({ publicKey, hostname = 'https://client-api.arko
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0" />
-    <script
-      data-callback="setupEnforcement"
-      src="${hostname}/v2/${publicKey}/api.js"
-      async
-    ></script>
     <script type="text/javascript">
       function setupEnforcement(arkoseEnforcement) {
         arkoseEnforcement.setConfig({
@@ -48,6 +43,11 @@ export function buildArkoseHtml({ publicKey, hostname = 'https://client-api.arko
         });
       }
     </script>
+    <script
+      data-callback="setupEnforcement"
+      src="${hostname}/v2/${publicKey}/api.js"
+      async
+    ></script>
   </head>
   <body style="display: flex; justify-content: center; margin: 0 auto;">
     <div id="challenge"></div>

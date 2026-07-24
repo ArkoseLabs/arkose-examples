@@ -43,7 +43,7 @@ const Arkose = forwardRef(function Arkose({
       onCompleted: (response) => callbacksRef.current.onCompleted(response.token),
       onReset: () => callbacksRef.current.onReset(),
       onHide: () => callbacksRef.current.onHide(),
-      onError: (response) => callbacksRef.current.onError(response?.error),
+      onError: (response) => callbacksRef.current.onError(response?.error?.error),
       onFailed: (response) => callbacksRef.current.onFailed(response),
     });
   }, [selector, mode]);
@@ -68,11 +68,11 @@ const Arkose = forwardRef(function Arkose({
     document.body.appendChild(script);
 
     return () => {
-      delete window.setupEnforcement;
+      if (window.setupEnforcement === setupEnforcement) { delete window.setupEnforcement; }
       const el = document.getElementById(scriptId);
       if (el) el.remove();
     };
-  }, [publicKey, nonce, scriptId, setupEnforcement]);
+  }, [publicKey, nonce, setupEnforcement]);
 
   if (mode === 'inline' && selector) {
     return <div id={selector.replace(/^#/, '')} />;

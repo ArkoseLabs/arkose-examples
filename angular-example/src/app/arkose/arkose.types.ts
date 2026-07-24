@@ -23,11 +23,13 @@ export interface ArkoseCompletedResponse {
 }
 
 export interface ArkoseErrorResponse {
-  error?: { error: string };
+  error?: { error: string; source?: string; status?: number };
 }
 
 export interface ArkoseFailedResponse {
   token?: string;
+  failed?: { error: string };
+  recoverable?: boolean;
 }
 
 declare global {

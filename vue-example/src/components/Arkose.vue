@@ -39,18 +39,13 @@ const setupEnforcement = (myEnforcement) => {
     onCompleted: (response) => emit('completed', response.token),
     onReset: () => emit('reset'),
     onHide: () => emit('hide'),
-    onError: (response) => emit('error', response),
+    onError: (response) => emit('error', response?.error?.error),
     onFailed: (response) => emit('failed', response),
   });
 };
 
 onMounted(() => {
   window.setupEnforcement = setupEnforcement;
-
-  if (enforcement) {
-    setupEnforcement(enforcement);
-    return;
-  }
 
   if (document.getElementById(scriptId)) {
     return;
@@ -61,7 +56,7 @@ onMounted(() => {
   script.src = `https://client-api.arkoselabs.com/v2/${props.publicKey}/api.js`;
   script.setAttribute('data-callback', 'setupEnforcement');
   script.async = true;
-  script.onerror = () => emit('error', { error: 'Script load failed' });
+  script.onerror = () => emit('error', 'Script load failed');
   if (props.nonce) {
     script.setAttribute('data-nonce', props.nonce);
   }

@@ -61,7 +61,7 @@ export default function App(): React.JSX.Element {
             androidLayerType="hardware"
             source={{ html }}
             onMessage={handleMessage}
-            originWhitelist={['*']}
+            originWhitelist={['https://']}
           />
         </View>
       </ScrollView>

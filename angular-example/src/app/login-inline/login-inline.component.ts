@@ -14,8 +14,9 @@ import { environment } from '../../environments/environment';
     <arkose
       [publicKey]="publicKey"
       mode="inline"
-      selectorId="arkose-inline"
+      selector="#arkose-inline"
       (completed)="onCompleted($event)"
+      (error)="onError($event)"
     />
     <p><a routerLink="/login-modal">Switch to Modal Login</a></p>
   `,
@@ -25,6 +26,9 @@ export class LoginInlineComponent {
   publicKey = environment.arkoseKey;
 
   onCompleted(token: string): void {
+    // Send token to your backend for server-side verification
     this.router.navigate(['/dashboard']);
   }
+
+  onError(message: string): void { window.alert(message); }
 }

@@ -18,4 +18,4 @@ npm-debug.log*
 coverage
 
 # Android local properties
-android/local.properties
+**/android/local.properties

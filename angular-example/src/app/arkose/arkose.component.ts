@@ -5,15 +5,15 @@ import { ArkoseEnforcement, ArkoseCompletedResponse, ArkoseErrorResponse, Arkose
 @Component({
   selector: 'arkose',
   standalone: true,
-  template: `@if (mode() === 'inline' && selectorId()) {
-    <div [id]="selectorId()" />
+  template: `@if (mode() === 'inline' && selector()) {
+    <div [id]="selector()?.replace('#', '')" />
   }`,
 })
 export class ArkoseComponent implements OnInit, OnDestroy {
   publicKey = input.required<string>();
   maxRetries = input(2);
   mode = input<'lightbox' | 'inline'>();
-  selectorId = input<string>();
+  selector = input<string>();
   nonce = input<string>();
 
   ready = output<void>();
@@ -23,11 +23,12 @@ export class ArkoseComponent implements OnInit, OnDestroy {
   completed = output<string>();
   reset = output<void>();
   hide = output<void>();
-  error = output<ArkoseErrorResponse>();
+  error = output<string>();
   failed = output<ArkoseFailedResponse>();
 
   private enforcement: ArkoseEnforcement | null = null;
   private retryCount = 0;
+  private destroyed = false;
   private zone = inject(NgZone);
   private scriptService = inject(ArkoseScriptService);
 
@@ -38,11 +39,12 @@ export class ArkoseComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     window.setupEnforcement = this.setupEnforcement;
     const script = this.scriptService.loadScript(this.publicKey(), this.nonce());
-    script.onerror = () => this.zone.run(() => this.error.emit({ error: 'Script load failed' } as ArkoseErrorResponse));
+    script.onerror = () => this.zone.run(() => this.error.emit('Script load failed'));
   }
 
   ngOnDestroy(): void {
-    delete window.setupEnforcement;
+    this.destroyed = true;
+    if (window.setupEnforcement === this.setupEnforcement) { delete window.setupEnforcement; }
     this.scriptService.removeScript(this.publicKey());
   }
 
@@ -59,7 +61,7 @@ export class ArkoseComponent implements OnInit, OnDestroy {
   private setupEnforcement = (enforcement: ArkoseEnforcement): void => {
     this.enforcement = enforcement;
     this.enforcement.setConfig({
-      selector: this.selectorId() ? `#${this.selectorId()}` : undefined,
+      selector: this.selector(),
       mode: this.mode(),
       onReady: () => this.zone.run(() => this.ready.emit()),
       onShown: () => this.zone.run(() => this.shown.emit()),
@@ -72,12 +74,13 @@ export class ArkoseComponent implements OnInit, OnDestroy {
       onHide: () => this.zone.run(() => this.hide.emit()),
       onError: async (response: ArkoseErrorResponse) => {
         const healthy = await this.checkHealth();
+        if (this.destroyed) { return; }
         if (healthy && this.retryCount < this.maxRetries()) {
           this.retryCount++;
           enforcement.reset();
           return;
         }
-        this.zone.run(() => this.error.emit(response));
+        this.zone.run(() => this.error.emit(response.error?.error ?? 'Unknown error'));
       },
       onFailed: (response: ArkoseFailedResponse) => this.zone.run(() => {
         this.failed.emit(response);

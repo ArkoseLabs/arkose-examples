@@ -17,6 +17,7 @@ import { environment } from '../../environments/environment';
       [publicKey]="publicKey"
       mode="lightbox"
       (completed)="onCompleted($event)"
+      (error)="onError($event)"
     />
     <p><a routerLink="/">Switch to Inline Login</a></p>
   `,
@@ -30,8 +31,11 @@ export class LoginModalComponent {
 
   onCompleted(token: string): void {
     this.token = token;
+    // Send token to your backend for server-side verification
     this.router.navigate(['/dashboard']);
   }
+
+  onError(message: string): void { window.alert(message); }
 
   onSubmit(): void {
     if (!this.token) {
