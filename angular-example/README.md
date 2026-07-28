@@ -1,5 +1,5 @@
 # arkose-angular-example
-This example project provides a simple Angular 19 component that wraps the Arkose Labs Client API.
+This example project provides a simple Angular 22 component that wraps the Arkose Labs Client API.
 More details of how to implement the Arkose Labs API can be found at https://developer.arkoselabs.com
 
 ## Run Locally

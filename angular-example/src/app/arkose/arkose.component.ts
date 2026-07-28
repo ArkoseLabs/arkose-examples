@@ -6,7 +6,7 @@ import { ArkoseEnforcement, ArkoseCompletedResponse, ArkoseErrorResponse, Arkose
   selector: 'arkose',
   standalone: true,
   template: `@if (mode() === 'inline' && selector()) {
-    <div [id]="selector()?.replace('#', '')" />
+    <div [id]="selector()?.replace('#', '')"></div>
   }`,
 })
 export class ArkoseComponent implements OnInit, OnDestroy {
