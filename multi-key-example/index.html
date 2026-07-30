@@ -27,6 +27,7 @@
         script.type = "text/javascript";
         script.src = `https://client-api.arkoselabs.com/v2/${key}/api.js`;
         script.setAttribute("data-callback", callback);
+        script.async = false;
         document.body.appendChild(script);
       }
   

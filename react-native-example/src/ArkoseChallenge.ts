@@ -46,7 +46,6 @@ export function buildArkoseHtml({ publicKey, hostname = 'https://client-api.arko
     <script
       data-callback="setupEnforcement"
       src="${hostname}/v2/${publicKey}/api.js"
-      async
     ></script>
   </head>
   <body style="display: flex; justify-content: center; margin: 0 auto;">

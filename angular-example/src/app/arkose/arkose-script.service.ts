@@ -16,7 +16,7 @@ export class ArkoseScriptService {
     script.id = scriptId;
     script.src = `https://client-api.arkoselabs.com/v2/${publicKey}/api.js`;
     script.setAttribute('data-callback', 'setupEnforcement');
-    script.async = true;
+    script.async = false;
     if (nonce) {
       script.setAttribute('data-nonce', nonce);
     }

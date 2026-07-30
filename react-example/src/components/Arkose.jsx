@@ -60,7 +60,7 @@ const Arkose = forwardRef(function Arkose({
     script.id = scriptId;
     script.src = `https://client-api.arkoselabs.com/v2/${publicKey}/api.js`;
     script.setAttribute('data-callback', 'setupEnforcement');
-    script.async = true;
+    script.async = false;
     script.onerror = () => callbacksRef.current.onError('Script load failed');
     if (nonce) {
       script.setAttribute('data-nonce', nonce);

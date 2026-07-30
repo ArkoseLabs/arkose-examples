@@ -55,7 +55,7 @@ onMounted(() => {
   script.id = scriptId;
   script.src = `https://client-api.arkoselabs.com/v2/${props.publicKey}/api.js`;
   script.setAttribute('data-callback', 'setupEnforcement');
-  script.async = true;
+  script.async = false;
   script.onerror = () => emit('error', 'Script load failed');
   if (props.nonce) {
     script.setAttribute('data-nonce', props.nonce);
