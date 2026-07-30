@@ -5,12 +5,6 @@ More details of how to implement the Arkose Labs API can be found at https://dev
 
 ## Run Locally
 
-#### Install dependencies
-
-```bash
-  npm install
-```
-
 #### Setup Public Keys
 
 Replace `<YOUR_PUBLIC_KEY_1>` and `<YOUR_PUBLIC_KEY_2>` with the public keys set up for your account in both the index.html file and, if applicable, the iframe.html file.
@@ -27,7 +21,7 @@ Replace `<YOUR_PUBLIC_KEY_1>` and `<YOUR_PUBLIC_KEY_2>` with the public keys set
   npm run start-iframe
 ```
 
-Access the page at http://localhost:1234/.
+Access the page at http://localhost:3000/.
 
 ## Documentation
 

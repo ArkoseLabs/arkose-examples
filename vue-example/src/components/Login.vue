@@ -4,62 +4,40 @@
     <Arkose
       :public-key="publicKey"
       mode="lightbox"
-      @onCompleted="onCompleted($event)"
-      @onError="onError($event)"
+      @completed="onCompleted"
+      @error="onError"
+      ref="arkoseRef"
     />
-    <input
-      type="text"
-      id="email"
-      name="email"
-      placeholder="Email"
-    >
-    <input
-      type="text"
-      id="password"
-      name="password"
-      placeholder="Password"
-    >
-    <input
-      type="submit"
-      @click="onSubmit()"
-      value="Submit"
-    >
+    <input type="text" id="email" name="email" placeholder="Email" />
+    <input type="password" id="password" name="password" placeholder="Password" />
+    <button @click="onSubmit">Submit</button>
     <nav>
-      <router-link to="/forgot-password">
-        Forgot Password
-      </router-link>
+      <router-link to="/forgot-password">Forgot Password</router-link>
     </nav>
   </div>
 </template>
 
-<script>
-import router from '../router.js';
+<script setup>
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 import Arkose from './Arkose.vue';
 
-export default {
-  name: 'LoginComponent',
-  components: {
-    Arkose
-  },
-  data () {
-    return {
-      publicKey: process.env.VUE_APP_ARKOSE_PUBLIC_KEY,
-      arkoseToken: null
-    };
-  },
-  methods: {
-    onCompleted (token) {
-      this.arkoseToken = token;
-      router.replace({ path: '/dashboard' });
-    },
-    onError (errorMessage) {
-      alert(errorMessage);
-    },
-    onSubmit () {
-      if (!this.arkoseToken) {
-        window.myEnforcement.run();
-      }
-    }
-  }
+const router = useRouter();
+const publicKey = import.meta.env.VITE_ARKOSE_PUBLIC_KEY;
+const arkoseToken = ref(null);
+const arkoseRef = ref(null);
+
+const onCompleted = (token) => {
+  arkoseToken.value = token;
+  router.replace({ path: '/dashboard' });
+};
+
+const onError = (errorMessage) => {
+  alert(errorMessage);
+};
+
+const onSubmit = () => {
+  if (arkoseToken.value) return;
+  arkoseRef.value?.run();
 };
 </script>

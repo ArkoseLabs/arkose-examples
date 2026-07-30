@@ -1,5 +1,5 @@
 # arkose-angular-example
-This example project provides a simple Angular (14) component that wraps the Arkose Labs Client API.
+This example project provides a simple Angular 22 component that wraps the Arkose Labs Client API.
 More details of how to implement the Arkose Labs API can be found at https://developer.arkoselabs.com
 
 ## Run Locally
@@ -22,20 +22,20 @@ Replace `<YOUR_PUBLIC_KEY>` with the public key set up for your account in both 
 
 ## Documentation
 
-It contains a shared module which has arkose component.
+It contains a standalone Arkose component.
 
 - arkose: Arkose Enforcement Challenge over a Modal mode or in Inline mode on HTML page
 
 #### To Show Arkose Modal
 
 ```http
-  http://localhost:4200/login/modal
+  http://localhost:4200/login-modal
 ```
 
 #### To Show Inline Arkose
 
 ```http
-  http://localhost:4200/login/inline
+  http://localhost:4200/
 ```
 
 Once Arkose Verification/Challenge is completed in login page, it will navigate to
@@ -44,6 +44,11 @@ Once Arkose Verification/Challenge is completed in login page, it will navigate 
   http://localhost:4200/dashboard
 ```
 
-In the Shared Modules, we have integrated Arkose security enforcement components. There is an Arkose Script Service which injects the requisite script. When the script is injected, the passing public key which is stored on an environment file is also passed along. Once the script is loaded, the workflow binds the callback function to a Window Object. The various usages of Callback Functions are available for perusal in [Arkose Development Documentation](https://developer.arkoselabs.com)
+The Arkose integration uses a standalone component with an injectable script service. The public key is stored in environment files. Once the script loads, the callback function is bound to a Window Object. NgZone is used to re-enter Angular's zone from Arkose callbacks that execute outside it. The various usages of Callback Functions are available for perusal in [Arkose Development Documentation](https://developer.arkoselabs.com)
 
-#### We have used NgZone in order to reenter Angular zone from a arkose task that was executed outside of the Angular zone.
+## Notes
+
+- This demo navigates to `/dashboard` on the `completed` event. In production, send the token to your backend and verify it with the Arkose Verify API before trusting it — never authenticate on the client token alone.
+- Pass a `nonce` input to `<arkose>` if you serve a strict `script-src` Content Security Policy.
+- In modal mode, call the component's `run()` method (via `viewChild`) to trigger the challenge on form submit; inline mode renders the challenge in place via the `selector` input (a full CSS selector, e.g. `#arkose-inline`).
+- On error the component checks the Arkose status page and auto-retries up to `maxRetries` times (default 2) before emitting `error`. Pass `[maxRetries]="0"` to disable.

@@ -119,8 +119,8 @@ export async function responseProvider(request) {
                         arkoseResetting = false;
                         arkose.run();
                     }
-                    document.cookie = arkoseCookieName + '=' + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-                    document.cookie = arkoseErrorCookieName + '=' + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                    document.cookie = arkoseCookieName + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                    document.cookie = arkoseErrorCookieName + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
                 },
                 onCompleted: function(response) {
                     arkoseComplete = true;

@@ -16,3 +16,6 @@ npm-debug.log*
 
 # Coverage directory
 coverage
+
+# Android local properties
+**/android/local.properties

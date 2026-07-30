@@ -23,11 +23,9 @@ chmod 755 gradlew
 cd ..
 ```
 
-Note: This example application was built for JDK 19 and below, we recommend using that version for running this application.
-
 ## Setup ARKOSE_PUBLIC_KEY
 
-Replace `<YOUR_PUBLIC_KEY>` with the public key set up for your account in the App.js file.
+Replace `<YOUR_PUBLIC_KEY>` with the public key set up for your account in the App.tsx file.
 
 ## Start the application
 
@@ -51,18 +49,9 @@ npm run android
 
 If everything is set up correctly, you should see the app running in your Android Emulator / iOS Simulator.
 
-If you receive errors from iOS, you may need to disable "flipper" in the iOS pod file. This can be done by 
-commenting out line 43 of [ios/Podfile](ios/Podfile) and then running the following again:
-
-```
-cd ios
-pod install
-cd ..
-```
-
 # Configuration
 
-This example application allows you to set custom host name (if applicable).
+This example application allows you to set a custom hostname (if applicable).
 
-This can be set in the [App.js file](App.js). 
+This can be set in the [App.tsx file](App.tsx).
 

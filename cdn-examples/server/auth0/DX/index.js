@@ -139,7 +139,7 @@ const verifyArkoseToken = async (
  * @return {Object} The response to handle the error
  */
 const handleFailure = (errorUrl) => {
-  return Response.redirect(errorUrl, '301'); // Set this to your error handling URL
+  return Response.redirect(errorUrl, 302); // Set this to your error handling URL
 };
 
 /**
@@ -285,7 +285,7 @@ export default {
               var arkoseRetry = 0;
               var arkoseReady = false;
               var arkoseResetting = false;
-              var arkoseCompleted = false;
+              var arkoseComplete = false;
               var submitForm = document.querySelector('form');
               var submitButton = null;
 
@@ -369,8 +369,8 @@ export default {
                               arkoseResetting = false;
                               arkose.run();
                           }
-                          document.cookie = arkoseCookieName + '=' + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-                          document.cookie = arkoseErrorCookieName + '=' + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                          document.cookie = arkoseCookieName + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                          document.cookie = arkoseErrorCookieName + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
                       },
                       onCompleted: function(response) {
                           arkoseComplete = true;
@@ -383,7 +383,7 @@ export default {
                       },
                       onError: function(response) {
                           checkArkoseStatus(function (isHealthy) {    
-                              if (isHealthy && arkoseRetry < arkoseMaxRetryCount) {
+                              if (isHealthy && arkoseRetry < arkoseRetryMax) {
                                   arkoseReady = false;
                                   arkoseResetting = true;
                                   arkose.reset();
@@ -403,6 +403,7 @@ export default {
                 script.type = 'text/javascript';
                 script.src = arkoseScriptSrc;
                 script.setAttribute('data-callback', 'setupEnforcement');
+                script.async = false;
                 script.id = 'arkose-script';
                 document.getElementsByTagName('head')[0].appendChild(script);
             }
@@ -437,7 +438,7 @@ export default {
     // If the request is a GET request inject the Arkose Labs Client-API script
     // If DX is being used, find the email address from the response.
     if (request.method === 'GET') {
-      checkResponse();
+      return checkResponse();
     }
     // If the request is not a GET request and has an Arkose Labs session cookie, process it
     const arkoseToken = getCookie(
